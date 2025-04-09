@@ -55,11 +55,11 @@ edition = \"2024\"
         let output = Command::new("cargo")
             .current_dir(temp_dir.path())
             .args(args)
-            .output();
+            .status();
         let output = output.map_err(|e| format!("Error when running binary command: {}", e))?;
 
-        if !output.status.success() {
-            println!("Cargo build failed with code {:?}", output.status.code());
+        if !output.success() {
+            println!("Cargo build failed with code {:?}", output.code());
             println!("Reopen editor? (y/N): ");
             std::io::stdout().flush().unwrap();
             let mut input = String::new();
