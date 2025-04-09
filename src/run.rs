@@ -1,5 +1,6 @@
 use std::ffi::OsStr;
 use std::fs;
+use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 use tempfile::{NamedTempFile, SpooledTempFile};
@@ -18,11 +19,19 @@ pub fn run<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     #[cfg(unix)]
     {
         println!("Making temporary file executable (chmod)");
-        Command::new("chmod").args([OsStr::new("+x"), temp_exe.path().as_os_str()]).status().map_err(|_| format!("Failed to mark binary as executable {:?}", temp_exe.path()))?;
+        Command::new("chmod").args([OsStr::new("+x"), temp_exe.path().as_os_str()]).status().map_err(|e| format!("E40 Failed to run chmod: {:?}", e))?;
     }
 
-    println!("Running binary...");
-    Command::new(temp_exe.path()).output().map_err(|e| format!("E39 Failed to run binary: {:?}", e))?;
+    let temp_exe_path = temp_exe.path().to_owned();
+    temp_exe.keep().map_err(|e| format!("E41 Failed to mark binary as non-temporary {:?}", e))?;
+
+    println!("Running binary...\n");
+    let status = Command::new(&temp_exe_path).status().map_err(|e| format!("E39 Failed to run binary: {:?}", e))?;
+
+    println!("\nExitted with code: {:?}", status.code());
+
+    println!("Removing temporary file");
+    fs::remove_file(temp_exe_path).map_err(|e| format!("E42 Temp file deletion error: {:?}", e))?;
 
     Ok(())
 }

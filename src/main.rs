@@ -11,6 +11,7 @@ use crate::config::{edit_config, get_config, reset_config, Config};
 use clap::Parser;
 use tempfile::TempDir;
 use crate::edit::edit;
+use crate::run::run;
 
 fn main() {
     if let Err(e) = wrapped_main() {
@@ -24,7 +25,9 @@ fn wrapped_main() -> Result<(), String> {
     let config = get_config()?;
 
     match args.subcommand() {
-        RssSubcommand::Run { .. } => {}
+        RssSubcommand::Run { file } => {
+            run(&config, file)?;
+        }
         RssSubcommand::Edit { file } => {
             edit(&config, PathBuf::from(file))?;
         }

@@ -43,10 +43,18 @@ edition = \"2024\"
             return Err(format!("Error when running project edit command: {}", e));
         }
 
-        println!("Building binary");
+
+        let args: &[&str] = if *config.use_debug_mode() {
+            println!("Building binary (debug)");
+            &["build"]
+        } else {
+            println!("Building binary (release)");
+            &["build", "--release"]
+        };
+
         let output = Command::new("cargo")
             .current_dir(temp_dir.path())
-            .arg("build")
+            .args(args)
             .output();
         let output = output.map_err(|e| format!("Error when running binary command: {}", e))?;
 
@@ -61,7 +69,14 @@ edition = \"2024\"
             }
         }
         else {
-            let binary_path = temp_dir.path().join("target").join("debug");
+            let binary_path = temp_dir.path().join("target");
+
+            let binary_path = if *config.use_debug_mode() {
+                binary_path.join("debug")
+            } else {
+                binary_path.join("release")
+            };
+
             #[cfg(unix)]
             let binary_path = binary_path.join(file_name);
             #[cfg(windows)]
@@ -86,6 +101,7 @@ edition = \"2024\"
         println!("Writing rss file (no binary)");
     }
     let file_contents = FileContents::new(project_zip, binary.unwrap_or(vec![]));
+    file_contents.print_stats();
     file_contents.save(path)?;
 
     Ok(())

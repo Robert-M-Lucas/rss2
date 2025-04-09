@@ -14,6 +14,7 @@ use edit_command::EditCommand;
 pub struct Config {
     config_edit_command: EditCommand,
     rust_project_edit_command: EditCommand,
+    use_debug_mode: bool,
 }
 
 impl Config {

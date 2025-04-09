@@ -1,5 +1,6 @@
 use std::path::Path;
 use std::fs;
+use human_bytes::human_bytes;
 
 pub struct FileContents {
     contents: Vec<u8>,
@@ -16,6 +17,12 @@ impl FileContents {
             contents: final_contents,
             zip_length: zipped_contents.len()
         }
+    }
+
+    pub fn print_stats(&self) {
+        println!("Project zip size: {}", human_bytes(self.zip_length as f64));
+        println!("Binary size: {}", human_bytes((self.contents.len() - self.zip_length - 8) as f64));
+        println!("Total size: {}", human_bytes(self.contents.len() as f64));
     }
 
     pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Option<FileContents>, String> {
