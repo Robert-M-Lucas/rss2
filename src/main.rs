@@ -14,6 +14,7 @@ use crate::edit::edit;
 use crate::run::run;
 
 fn main() {
+
     if let Err(e) = wrapped_main() {
         println!("{e}");
     }

@@ -1,7 +1,11 @@
 [package]
-name = "rss2"
-version = "0.1.0"
+name = "rs-script"
+version = "0.2.0"
 edition = "2024"
+authors = ["Robert Lucas <100799838+Robert-M-Lucas@users.noreply.github.com>"]
+description = "A tool to create Rust scripts"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/Robert-M-Lucas/rss2"
 
 [dependencies]
 clap = { version = "4.5.35", features = ["derive"] }
@@ -13,3 +17,7 @@ serde_json = "1.0.140"
 tempfile = "3.19.1"
 walkdir = "2.5.0"
 zip = "2.6.1"
+
+[[bin]]
+name = "rss"
+path = "src/main.rs"
