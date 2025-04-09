@@ -26,5 +26,7 @@ pub enum RssSubcommand {
     Config {
         #[arg(short, long, action, help = "Reset config to default")]
         reset: bool,
+        #[arg(short, long, action, help = "Outputs the config file location")]
+        r#where: bool,
     },
 }

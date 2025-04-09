@@ -13,6 +13,11 @@ pub fn run<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
 
     let temp_exe = NamedTempFile::new().map_err(|e| format!("E37 Temp file creation error: {:?}", e))?;
 
+    if path_contents.bin_contents().len() == 0 {
+        println!("Build failed at last edit resulting in no binary");
+        return Ok(());
+    }
+
     println!("Writing binary to temporary file");
     fs::write(temp_exe.path(), path_contents.bin_contents()).map_err(|e| format!("E38 Temp file creation error: {:?}", e))?;
 
