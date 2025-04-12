@@ -4,19 +4,18 @@ mod edit;
 mod run;
 mod file_contents;
 
-use std::env;
-use std::path::PathBuf;
 use crate::args::{RssArgs, RssSubcommand};
-use crate::config::{edit_config, get_config, get_config_path, reset_config, Config};
-use clap::Parser;
-use tempfile::TempDir;
+use crate::config::{edit_config, get_config, get_config_path, reset_config};
 use crate::edit::edit;
 use crate::run::run;
+use clap::Parser;
+use color_print::cprintln;
+use std::path::PathBuf;
 
 fn main() {
 
     if let Err(e) = wrapped_main() {
-        println!("{e}");
+        cprintln!("\n<red, bold>{e}</>");
     }
 }
 

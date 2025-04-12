@@ -5,7 +5,7 @@ use derive_getters::Getters;
 #[command(version, about, long_about = None)]
 pub struct RssArgs {
     #[command(subcommand)]
-    subcommand: RssSubcommand,
+    subcommand: RssSubcommand
 }
 
 #[derive(Parser, Debug)]

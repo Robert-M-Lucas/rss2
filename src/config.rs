@@ -1,13 +1,15 @@
 pub mod edit_command;
 
+use color_print::cprintln;
+use derive_getters::Getters;
+use directories::BaseDirs;
+use edit_command::EditCommand;
+use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
 use std::io::Read;
 use std::path::{Path, PathBuf};
-use derive_getters::Getters;
-use directories::BaseDirs;
-use serde::{Deserialize, Serialize};
-use edit_command::EditCommand;
+use std::time::Instant;
 
 #[derive(Serialize, Deserialize, Debug, Default, Getters)]
 #[serde(default)]
@@ -18,6 +20,7 @@ pub struct Config {
 }
 
 impl Config {
+    #[allow(dead_code)]
     pub fn save(&self) -> Result<(), String> {
         let config_file = get_config_path()?;
         let json = serde_json::to_string_pretty(&self).map_err(|_| "E13 Failed to serialise config".to_owned())?;
@@ -35,8 +38,12 @@ pub fn get_config_path() -> Result<PathBuf, String> {
 }
 
 pub fn get_config() -> Result<Config, String> {
+    print!("Fetching config... ");
+    let start = Instant::now();
+
     let config_file = get_config_path()?;
-    Ok(if Path::new(&config_file).exists() {
+
+    let r = Ok(if Path::new(&config_file).exists() {
         let mut file = File::open(&config_file).map_err(|_| "E15 Failed to open config file".to_owned())?;
         let mut contents = String::new();
         file.read_to_string(&mut contents)
@@ -47,7 +54,10 @@ pub fn get_config() -> Result<Config, String> {
         let json = serde_json::to_string_pretty(&config).map_err(|_| "E18 Failed to serialize config".to_owned())?;
         fs::write(&config_file, json).map_err(|_| "E19 Failed to write config file".to_owned())?;
         config
-    })
+    });
+    let time = Instant::now() - start;
+    cprintln!("<cyan>[{:?}]</>", time);
+    r
 }
 
 pub fn reset_config() -> Result<(String, String), String> {

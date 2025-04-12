@@ -40,7 +40,7 @@ pub fn unzip_from_bytes<P: AsRef<Path>>(bytes: &[u8], target_dir: P) -> Result<(
 
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).map_err(|e| format!("E29 Failed to open archive: {}", e))?;
-        let outpath = target_dir.as_ref().join(file.sanitized_name());
+        let outpath = target_dir.as_ref().join(file.mangled_name());
 
         if file.name().ends_with('/') {
             // Create directory
