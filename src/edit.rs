@@ -4,7 +4,6 @@ use crate::util::file_contents::FileContents;
 use crate::util::zip::zip_dir_to_bytes;
 use color_print::{cprint, cprintln};
 use std::fs;
-use std::io::Write;
 use std::path::Path;
 use std::time::Instant;
 use crate::target_triple;
