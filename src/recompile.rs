@@ -4,6 +4,7 @@ use crate::util::file_contents::FileContents;
 use color_print::{cprint, cprintln};
 use std::path::Path;
 use std::time::Instant;
+use crate::target_triple;
 
 pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
@@ -19,8 +20,8 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String>
         return Ok(());
     };
 
-    cprint!("Writing binary to rss file... ");
-    path_contents.replace_binary(&binary);
+    cprint!("Writing binary ({}) to rss file... ", target_triple());
+    path_contents.replace_binary(target_triple(), &binary);
     let start = Instant::now();
     path_contents.save(path)?;
     let time = Instant::now() - start;

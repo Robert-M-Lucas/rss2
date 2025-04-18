@@ -7,6 +7,7 @@ use std::path::Path;
 use std::process::Command;
 use std::time::Instant;
 use tempfile::NamedTempFile;
+use crate::target_triple;
 
 pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
     print!("Reading binary from file... ");
@@ -14,6 +15,10 @@ pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
     let path_contents = FileContents::from_path(&path)?.ok_or(format!("E36 File contents not found: {:?}", path.as_ref()))?;
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
+
+    if path_contents.target_triple() != target_triple() {
+        return Err(format!("E47 File compiled for target '{}', whereas current target is '{}'", path_contents.target_triple(), target_triple()));
+    }
 
     let temp_exe = NamedTempFile::new().map_err(|e| format!("E37 Temp file creation error: {:?}", e))?;
 

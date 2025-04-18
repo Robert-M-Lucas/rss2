@@ -16,8 +16,11 @@ use std::path::PathBuf;
 use crate::recompile::recompile;
 use crate::strip::strip;
 
-fn main() {
+const fn target_triple() -> &'static str {
+    env!("TARGET")
+}
 
+fn main() {
     if let Err(e) = wrapped_main() {
         cprintln!("\n<red, bold>{e}</>");
     }

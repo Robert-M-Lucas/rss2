@@ -7,6 +7,7 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 use std::time::Instant;
+use crate::target_triple;
 
 pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
@@ -50,12 +51,12 @@ edition = \"2024\"
 
 
     if binary.is_some() {
-        cprint!("Writing rss file <green, bold>(project and binary)</>... ");
+        cprint!("Writing rss file <green, bold>(project and binary - {})</>... ", target_triple());
     }
     else {
         cprint!("Writing rss file <red, bold>(no binary)</>... ");
     }
-    let file_contents = FileContents::new(project_zip, binary.unwrap_or(vec![]));
+    let file_contents = FileContents::new(project_zip, binary.unwrap_or(vec![]), target_triple());
     let start = Instant::now();
     file_contents.save(path)?;
     let time = Instant::now() - start;
