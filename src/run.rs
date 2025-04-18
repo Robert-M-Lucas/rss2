@@ -1,5 +1,5 @@
 use crate::config::Config;
-use crate::file_contents::FileContents;
+use crate::util::file_contents::FileContents;
 use color_print::cprintln;
 use std::ffi::OsStr;
 use std::fs;
