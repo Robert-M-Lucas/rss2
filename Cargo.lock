@@ -650,7 +650,7 @@ dependencies = [
 
 [[package]]
 name = "rs-script"
-version = "0.2.2"
+version = "0.2.3"
 dependencies = [
  "clap",
  "color-print",
