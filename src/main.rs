@@ -49,7 +49,7 @@ fn wrapped_main() -> Result<(), String> {
                 edit_config(&config)?;
             }
             else if *r#where && !reset {
-                println!("Config at {:?}", get_config_path()?);
+                println!("Config at '{}'", get_config_path()?.as_os_str().to_string_lossy());
             }
             else {
                 let (p, json) = reset_config()?;

@@ -1,3 +1,6 @@
+#[cfg(unix)]
+use std::ffi::OsStr;
+
 use crate::config::Config;
 use crate::util::file_contents::FileContents;
 use color_print::cprintln;
