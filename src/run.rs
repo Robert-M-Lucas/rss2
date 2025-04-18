@@ -16,15 +16,15 @@ pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
 
-    if path_contents.target_triple() != target_triple() {
-        return Err(format!("E47 File compiled for target '{}', whereas current target is '{}'", path_contents.target_triple(), target_triple()));
-    }
-
-    let temp_exe = NamedTempFile::new().map_err(|e| format!("E37 Temp file creation error: {:?}", e))?;
-
     if path_contents.bin_contents().len() == 0 {
         return Err("E43 Build failed at last edit resulting in no binary".to_owned());
     }
+
+    if path_contents.target_triple() != target_triple() {
+        return Err(format!("E47 File compiled for target '{}', whereas current target is '{}'. Use `rss recompile [file]` to recompile for the current platform.", path_contents.target_triple(), target_triple()));
+    }
+
+    let temp_exe = NamedTempFile::new().map_err(|e| format!("E37 Temp file creation error: {:?}", e))?;   
 
     print!("Writing binary to temporary file... ");
     let start = Instant::now();
