@@ -53,8 +53,8 @@ fn wrapped_main() -> Result<(), String> {
             }
             else {
                 let (p, json) = reset_config()?;
-                println!("Config:\n{json}");
-                println!("Reset config at {p}");
+                println!("Reset config to:\n{json}");
+                println!("Reset config at '{p}'");
             }
         }
     }

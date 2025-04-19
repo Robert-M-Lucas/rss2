@@ -5,7 +5,7 @@ use std::process::Command;
 use std::time::Instant;
 use color_print::cprintln;
 use tempfile::TempDir;
-use crate::config::Config;
+use crate::config::{get_config_path, Config};
 use crate::util::file_contents::FileContents;
 use crate::util::zip::unzip_from_bytes;
 
@@ -35,7 +35,8 @@ pub fn project_edit_loop(mut skip_first: bool, config: &Config, temp_dir: &TempD
         if !skip_first {
             println!("Opening editor... ");
             if let Err(e) = config.rust_project_edit_command().to_command(Some(temp_dir_string))?.output() {
-                return Err(format!("Error when running project edit command: {}", e));
+                return Err(format!("E49 Error when running project edit command: {}\n\
+                    Check/edit the command used in '{}'.", e, get_config_path()?.as_os_str().to_string_lossy()));
             }
         }
         skip_first = false;

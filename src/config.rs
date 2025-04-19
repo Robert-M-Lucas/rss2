@@ -1,13 +1,13 @@
 pub mod edit_command;
 
-use color_print::cprintln;
+use color_print::{cprint, cprintln};
 use derive_getters::Getters;
 use directories::BaseDirs;
 use edit_command::EditCommand;
 use serde::{Deserialize, Serialize};
 use std::fs;
 use std::fs::File;
-use std::io::Read;
+use std::io::{stdin, stdout, Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
@@ -38,6 +38,7 @@ pub fn get_config_path() -> Result<PathBuf, String> {
 }
 
 pub fn get_config() -> Result<Config, String> {
+    let mut cancel_time = false;
     print!("Fetching config... ");
     let start = Instant::now();
 
@@ -50,13 +51,26 @@ pub fn get_config() -> Result<Config, String> {
             .map_err(|_| "E16 Failed to read config file".to_owned())?;
         serde_json::from_str(&contents).map_err(|_| "E17 Failed to parse config file".to_owned())?
     } else {
+        cancel_time = true;
+        println!("\nConfig file not found. Creating default at '{}'.", get_config_path()?.as_os_str().to_string_lossy());
+        cprintln!("<yellow, bold>IMPORTANT: Change the editor in the config if you do not have VS Code in path!</>");
+        print!("Press enter to continue...");
+        stdout().flush().ok();
+        let mut t = String::new();
+        stdin().read_line(&mut t).ok();
         let config = Config::default();
         let json = serde_json::to_string_pretty(&config).map_err(|_| "E18 Failed to serialize config".to_owned())?;
+        print!("Writing config... ");
+        let start = Instant::now();
         fs::write(&config_file, json).map_err(|_| "E19 Failed to write config file".to_owned())?;
+        let time = Instant::now() - start;
+        cprintln!("<cyan>[{:?}]</>", time);
         config
     });
-    let time = Instant::now() - start;
-    cprintln!("<cyan>[{:?}]</>", time);
+    if !cancel_time {
+        let time = Instant::now() - start;
+        cprintln!("<cyan>[{:?}]</>", time);
+    }
     r
 }
 
@@ -65,7 +79,7 @@ pub fn reset_config() -> Result<(String, String), String> {
     let config = Config::default();
     let json = serde_json::to_string_pretty(&config).map_err(|_| "E20 Failed to serialize config".to_owned())?;
     fs::write(&config_file, &json).map_err(|_| "E21 Failed to write config file".to_owned())?;
-    Ok((format!("{:?}", config_file), json))
+    Ok((config_file.as_os_str().to_string_lossy().to_string(), json))
 }
 
 pub fn edit_config(config: &Config) -> Result<(), String> {
@@ -74,7 +88,8 @@ pub fn edit_config(config: &Config) -> Result<(), String> {
         return Err("E02 Failed to get config path".to_owned());
     };
     if let Err(e) = config.config_edit_command().to_command(Some(&config_path))?.output() {
-        return Err(format!("Error when running config edit command: {}", e));
+        return Err(format!("E48 Error when running config edit command: {}\n\
+        Check/edit the command used in '{}'.", e, get_config_path()?.as_os_str().to_string_lossy()));
     }
     Ok(())
 }
