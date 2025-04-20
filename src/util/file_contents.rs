@@ -63,12 +63,23 @@ impl FileContents {
         );
         cprint!(
             "  - Binary size: <cyan>{}</>",
-            human_bytes((LENGTH_TYPE_SIZE + self.contents.len() - LENGTH_TYPE_SIZE - self.zip_length - LENGTH_TYPE_SIZE - self.triple_length) as f64)
+            human_bytes(
+                (LENGTH_TYPE_SIZE + self.contents.len()
+                    - LENGTH_TYPE_SIZE
+                    - self.zip_length
+                    - LENGTH_TYPE_SIZE
+                    - self.triple_length) as f64
+            )
         );
-        if self.contents.len() - LENGTH_TYPE_SIZE - self.zip_length - LENGTH_TYPE_SIZE - self.triple_length == 0 {
+        if self.contents.len()
+            - LENGTH_TYPE_SIZE
+            - self.zip_length
+            - LENGTH_TYPE_SIZE
+            - self.triple_length
+            == 0
+        {
             cprintln!("<red> (no binary)</>");
-        }
-        else {
+        } else {
             println!();
         }
         cprintln!(

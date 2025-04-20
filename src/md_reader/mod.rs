@@ -20,7 +20,9 @@ pub fn md_reader(contents: &str) -> Result<(), String> {
 pub fn run(mut terminal: DefaultTerminal, text: Text) -> Result<(), String> {
     let mut state = RScrollbarState::new(text.height());
     loop {
-        if event::poll(Duration::from_millis(15)).map_err(|e| format!("Failed to read crossterm events({e})"))? {
+        if event::poll(Duration::from_millis(15))
+            .map_err(|e| format!("Failed to read crossterm events({e})"))?
+        {
             match event::read() {
                 Ok(event::Event::Key(key)) if key.kind == event::KeyEventKind::Press => {
                     if !on_key(key, &mut state) {
@@ -31,26 +33,28 @@ pub fn run(mut terminal: DefaultTerminal, text: Text) -> Result<(), String> {
             }
         }
 
-        terminal.draw(|frame| {
-            let [body, scrollbar] =
-                Layout::horizontal([Constraint::Fill(1), Constraint::Length(1)])
-                    .areas(frame.area());
-            state.view_height = body.height as usize;
+        terminal
+            .draw(|frame| {
+                let [body, scrollbar] =
+                    Layout::horizontal([Constraint::Fill(1), Constraint::Length(1)])
+                        .areas(frame.area());
+                state.view_height = body.height as usize;
 
-            let scroll_pos = state
-                .position
-                .min(text.height().saturating_sub(state.view_height))
-                as u16;
-            Paragraph::new(text.clone())
-                .scroll((scroll_pos, 0))
-                .wrap(Wrap { trim: false })
-                .render(body, frame.buffer_mut());
-            Scrollbar::new(ScrollbarOrientation::VerticalRight).render(
-                scrollbar,
-                frame.buffer_mut(),
-                &mut (&mut state).into(),
-            );
-        }).map_err(|e| format!("Failed to draw ratatui frame ({e})"))?;
+                let scroll_pos = state
+                    .position
+                    .min(text.height().saturating_sub(state.view_height))
+                    as u16;
+                Paragraph::new(text.clone())
+                    .scroll((scroll_pos, 0))
+                    .wrap(Wrap { trim: false })
+                    .render(body, frame.buffer_mut());
+                Scrollbar::new(ScrollbarOrientation::VerticalRight).render(
+                    scrollbar,
+                    frame.buffer_mut(),
+                    &mut (&mut state).into(),
+                );
+            })
+            .map_err(|e| format!("Failed to draw ratatui frame ({e})"))?;
     }
     Ok(())
 }

@@ -155,7 +155,13 @@ edition = \"2024\"
     file_contents.save(&path)?;
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
-    file_contents.print_stats(&path.as_ref().file_name().ok_or("E63 Failed to read filename from path")?.to_string_lossy());
+    file_contents.print_stats(
+        &path
+            .as_ref()
+            .file_name()
+            .ok_or("E63 Failed to read filename from path")?
+            .to_string_lossy(),
+    );
 
     Ok(())
 }

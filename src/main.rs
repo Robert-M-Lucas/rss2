@@ -41,8 +41,8 @@ fn wrapped_main() -> Result<(), String> {
         RssSubcommand::Run { file } => {
             let config = get_config()?;
             let binary_exists = run(&config, file)?;
-            if !binary_exists {
-                cprintln!("rss file has no binary - recompiling");
+            if let Some(no_binary_reason) = binary_exists {
+                cprintln!("<yellow, bold>[!] {no_binary_reason} - recompiling...</>");
                 let compile_succeeded = recompile(&config, file)?;
                 if compile_succeeded {
                     run(&config, file)?;

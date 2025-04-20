@@ -31,7 +31,13 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<bool, Strin
     path_contents.save(&path)?;
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
-    path_contents.print_stats(&path.as_ref().file_name().ok_or("E62 Failed to read filename from path")?.to_string_lossy());
+    path_contents.print_stats(
+        &path
+            .as_ref()
+            .file_name()
+            .ok_or("E62 Failed to read filename from path")?
+            .to_string_lossy(),
+    );
 
     Ok(true)
 }

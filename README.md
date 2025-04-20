@@ -35,4 +35,4 @@ rss run myfile.rss
 - Recompile a file: `rss recompile myfile.rss`
 
 ## Cross Compatability
-The platform a binary was compiled for is automatically saved. An error and suggested remedy will be displayed if the current binary attached to a file was compiled for a different platform.
+The platform a binary was compiled for is automatically saved. Should this not match the current platform, the file will be automatically recompiled.

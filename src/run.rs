@@ -9,7 +9,7 @@ use std::process::Command;
 use std::time::Instant;
 use tempfile::NamedTempFile;
 
-pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<bool, String> {
+pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<Option<String>, String> {
     print!("Reading binary from file... ");
     let start = Instant::now();
     let path_contents = FileContents::from_path(&path)?
@@ -18,15 +18,15 @@ pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<bool, String> {
     cprintln!("<cyan>[{:?}]</>", time);
 
     if path_contents.bin_contents().len() == 0 {
-        return Ok(false);
+        return Ok(Some("rss file has no binary".to_owned()));
     }
 
     if path_contents.target_triple() != target_triple() {
-        return Err(format!(
-            "E47 File compiled for target '{}', whereas current target is '{}'. Use `rss recompile [file]` to recompile for the current platform.",
+        return Ok(Some(format!(
+            "File compiled for target '{}', whereas current target is '{}'",
             path_contents.target_triple(),
             target_triple()
-        ));
+        )));
     }
 
     let temp_exe =
@@ -63,5 +63,5 @@ pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<bool, String> {
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
 
-    Ok(true)
+    Ok(None)
 }
