@@ -11,12 +11,22 @@ use std::io::{stdin, stdout, Read, Write};
 use std::path::{Path, PathBuf};
 use std::time::Instant;
 
-#[derive(Serialize, Deserialize, Debug, Default, Getters)]
+#[derive(Serialize, Deserialize, Debug, Getters)]
 #[serde(default)]
 pub struct Config {
     config_edit_command: EditCommand,
     rust_project_edit_command: EditCommand,
-    use_debug_mode: bool,
+    use_debug_mode: bool
+}
+
+impl Default for Config {
+    fn default() -> Self {
+        Config {
+            config_edit_command: Default::default(),
+            rust_project_edit_command: Default::default(),
+            use_debug_mode: false,
+        }
+    }
 }
 
 impl Config {

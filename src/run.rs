@@ -10,6 +10,7 @@ use std::process::Command;
 use std::time::Instant;
 use tempfile::NamedTempFile;
 use crate::target_triple;
+use crate::util::executable::make_executable;
 
 pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
     print!("Reading binary from file... ");
@@ -34,14 +35,7 @@ pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
 
-    #[cfg(unix)]
-    {
-        print!("Making temporary file executable (chmod)... ");
-        let start = Instant::now();
-        Command::new("chmod").args([OsStr::new("+x"), temp_exe.path().as_os_str()]).status().map_err(|e| format!("E40 Failed to run chmod: {:?}", e))?;
-        let time = Instant::now() - start;
-        cprintln!("<cyan>[{:?}]</>", time);
-    }
+    make_executable(&temp_exe)?;
 
     let temp_exe_path = temp_exe.path().to_owned();
     temp_exe.keep().map_err(|e| format!("E41 Failed to mark binary as non-temporary {:?}", e))?;

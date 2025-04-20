@@ -6,6 +6,7 @@ mod strip;
 mod recompile;
 pub mod util;
 
+use std::fs;
 use crate::args::{RssArgs, RssSubcommand};
 use crate::config::{edit_config, get_config, get_config_path, reset_config};
 use crate::edit::edit;
@@ -21,6 +22,9 @@ const fn target_triple() -> &'static str {
 }
 
 fn main() {
+    #[cfg(all(not(windows), not(unix)))]
+    compile_error!("Only Windows and Unix-derivatives are supported");
+
     if let Err(e) = wrapped_main() {
         cprintln!("\n<red, bold>{e}</>");
     }
