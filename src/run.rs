@@ -9,7 +9,7 @@ use std::process::Command;
 use std::time::Instant;
 use tempfile::NamedTempFile;
 
-pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
+pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<bool, String> {
     print!("Reading binary from file... ");
     let start = Instant::now();
     let path_contents = FileContents::from_path(&path)?
@@ -18,7 +18,7 @@ pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
     cprintln!("<cyan>[{:?}]</>", time);
 
     if path_contents.bin_contents().len() == 0 {
-        return Err("E43 Build failed at last edit resulting in no binary".to_owned());
+        return Ok(false);
     }
 
     if path_contents.target_triple() != target_triple() {
@@ -63,5 +63,5 @@ pub fn run<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
 
-    Ok(())
+    Ok(true)
 }

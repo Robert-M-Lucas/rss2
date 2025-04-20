@@ -152,10 +152,10 @@ edition = \"2024\"
     }
     let file_contents = FileContents::new(project_zip, binary.unwrap_or(vec![]), target_triple());
     let start = Instant::now();
-    file_contents.save(path)?;
+    file_contents.save(&path)?;
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
-    file_contents.print_stats();
+    file_contents.print_stats(&path.as_ref().file_name().ok_or("E63 Failed to read filename from path")?.to_string_lossy());
 
     Ok(())
 }

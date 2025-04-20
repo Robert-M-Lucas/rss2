@@ -40,7 +40,14 @@ fn wrapped_main() -> Result<(), String> {
         }
         RssSubcommand::Run { file } => {
             let config = get_config()?;
-            run(&config, file)?;
+            let binary_exists = run(&config, file)?;
+            if !binary_exists {
+                cprintln!("rss file has no binary - recompiling");
+                let compile_succeeded = recompile(&config, file)?;
+                if compile_succeeded {
+                    run(&config, file)?;
+                }
+            }
         }
         RssSubcommand::Edit { file } => {
             let config = get_config()?;

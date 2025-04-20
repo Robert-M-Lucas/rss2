@@ -1,12 +1,9 @@
 #[cfg(unix)]
-use std::ffi::OsStr;
-#[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
 use std::fs;
 use std::fs::Permissions;
 use color_print::cprintln;
 use std::path::Path;
-use std::process::Command;
 use std::time::Instant;
 
 pub fn make_executable<P: AsRef<Path>>(file: P) -> Result<(), String> {

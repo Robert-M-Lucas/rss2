@@ -1,4 +1,4 @@
-use color_print::cprintln;
+use color_print::{cprint, cprintln};
 use human_bytes::human_bytes;
 use std::borrow::Cow;
 use std::fs;
@@ -51,21 +51,28 @@ impl FileContents {
         self.contents.extend_from_slice(binary); // binary
     }
 
-    pub fn print_stats(&self) {
+    pub fn print_stats(&self, file_name: &str) {
+        println!("{}:", file_name);
         cprintln!(
-            "Project zip size: <cyan>{}</>",
+            "  - Project zip size: <cyan>{}</>",
             human_bytes(self.zip_length as f64)
         );
         cprintln!(
-            "Target triple indicator size: <cyan>{}</>",
-            human_bytes(self.triple_length as f64)
+            "  - Target triple indicator size: <cyan>{}</>",
+            human_bytes((LENGTH_TYPE_SIZE + self.triple_length) as f64)
         );
-        cprintln!(
-            "Binary size: <cyan>{}</>",
-            human_bytes((self.contents.len() - self.zip_length - LENGTH_TYPE_SIZE) as f64)
+        cprint!(
+            "  - Binary size: <cyan>{}</>",
+            human_bytes((LENGTH_TYPE_SIZE + self.contents.len() - LENGTH_TYPE_SIZE - self.zip_length - LENGTH_TYPE_SIZE - self.triple_length) as f64)
         );
+        if self.contents.len() - LENGTH_TYPE_SIZE - self.zip_length - LENGTH_TYPE_SIZE - self.triple_length == 0 {
+            cprintln!("<red> (no binary)</>");
+        }
+        else {
+            println!();
+        }
         cprintln!(
-            "Total size: <cyan>{}</>",
+            "  Total size: <cyan>{}</>",
             human_bytes(self.contents.len() as f64)
         );
     }

@@ -16,9 +16,9 @@ pub fn strip<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
 
     print!("Saving stripped file... ");
     let start = Instant::now();
-    path_contents.save(path)?;
+    path_contents.save(&path)?;
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
-    path_contents.print_stats();
+    path_contents.print_stats(&path.as_ref().file_name().ok_or("E61 Failed to read filename from path")?.to_string_lossy());
     Ok(())
 }

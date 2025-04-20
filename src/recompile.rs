@@ -8,7 +8,7 @@ use color_print::{cprint, cprintln};
 use std::path::Path;
 use std::time::Instant;
 
-pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
+pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<bool, String> {
     let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
 
     let mut path_contents = FileContents::from_path(&path)?
@@ -22,16 +22,16 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String>
         cprintln!(
             "<red, bold>Failed to compile binary. Use `rss strip [file]` to remove the existing binary.</>"
         );
-        return Ok(());
+        return Ok(false);
     };
 
     cprint!("Writing binary ({}) to rss file... ", target_triple());
     path_contents.replace_binary(target_triple(), &binary);
     let start = Instant::now();
-    path_contents.save(path)?;
+    path_contents.save(&path)?;
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
-    path_contents.print_stats();
+    path_contents.print_stats(&path.as_ref().file_name().ok_or("E62 Failed to read filename from path")?.to_string_lossy());
 
-    Ok(())
+    Ok(true)
 }
