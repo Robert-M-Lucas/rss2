@@ -1,6 +1,6 @@
-use std::process::Command;
-use serde::{Deserialize, Serialize};
 use derive_getters::Getters;
+use serde::{Deserialize, Serialize};
+use std::process::Command;
 
 #[derive(Debug, Serialize, Deserialize, Getters)]
 #[serde(default)]
@@ -20,12 +20,10 @@ impl EditCommand {
                 if let Some(insert) = insert {
                     command.arg(insert);
                     inserted = true;
-                }
-                else {
+                } else {
                     return Err("E01 Found $$$ in command with no insertion".to_owned());
                 }
-            }
-            else {
+            } else {
                 command = command.arg(arg);
             }
         }
@@ -41,10 +39,7 @@ impl Default for EditCommand {
     fn default() -> Self {
         EditCommand {
             command: "code".to_owned(),
-            args: vec![
-                "-w".to_owned(),
-                "$$$".to_owned(),
-            ],
+            args: vec!["-w".to_owned(), "$$$".to_owned()],
         }
     }
 }

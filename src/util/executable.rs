@@ -1,8 +1,10 @@
+#[cfg(unix)]
 use std::ffi::OsStr;
+
+use color_print::cprintln;
 use std::path::Path;
 use std::process::Command;
 use std::time::Instant;
-use color_print::cprintln;
 
 pub fn make_executable<P: AsRef<Path>>(file: P) -> Result<(), String> {
     #[cfg(unix)]
@@ -10,7 +12,9 @@ pub fn make_executable<P: AsRef<Path>>(file: P) -> Result<(), String> {
         print!("Making file executable (chmod)... ");
         let start = Instant::now();
         // TODO: Might be possible without running chmod (directly modifying unix file flags)
-        let status = Command::new("chmod").args([OsStr::new("+x"), file.as_ref().as_os_str()]).status()
+        let status = Command::new("chmod")
+            .args([OsStr::new("+x"), file.as_ref().as_os_str()])
+            .status()
             .map_err(|e| format!("E40 Failed to run chmod: {:?}", e))?;
 
         if !status.success() {

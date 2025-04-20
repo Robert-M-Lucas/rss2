@@ -5,11 +5,14 @@ use derive_getters::Getters;
 #[command(version, about, long_about = None)]
 pub struct RssArgs {
     #[command(subcommand)]
-    subcommand: RssSubcommand
+    subcommand: RssSubcommand,
 }
 
 #[derive(Parser, Debug)]
 pub enum RssSubcommand {
+    #[command(about = "Read the README")]
+    Readme,
+
     #[command(about = "Runs an rss file")]
     Run {
         #[arg(help = "File to run")]

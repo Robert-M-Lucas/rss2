@@ -1,21 +1,33 @@
+use crate::config::{Config, get_config_path};
+use crate::util::file_contents::FileContents;
+use crate::util::zip::unzip_from_bytes;
+use color_print::cprintln;
 use std::fs;
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
 use std::time::Instant;
-use color_print::cprintln;
 use tempfile::TempDir;
-use crate::config::{get_config_path, Config};
-use crate::util::file_contents::FileContents;
-use crate::util::zip::unzip_from_bytes;
 
-pub fn create_temp_project_dir<P: AsRef<Path>>(path: P) -> Result<(TempDir, String, String), String> {
+pub fn create_temp_project_dir<P: AsRef<Path>>(
+    path: P,
+) -> Result<(TempDir, String, String), String> {
     print!("Creating temporary directory... ");
     let start = Instant::now();
-    let Ok(temp_dir) = TempDir::new() else { return Err("E05 Failed to create temp directory".to_owned()) };
-    let Some(temp_dir_string) = temp_dir.path().to_str().map(|s| s.to_owned()) else { return Err("E06 Failed get temp directory path".to_owned()) };
-    let file_name = path.as_ref().file_stem().ok_or(format!("Invalid path: {:?}", path.as_ref()))?;
-    let file_name = file_name.to_str().ok_or(format!("Invalid file name: {:?}", path.as_ref()))?.to_owned();
+    let Ok(temp_dir) = TempDir::new() else {
+        return Err("E05 Failed to create temp directory".to_owned());
+    };
+    let Some(temp_dir_string) = temp_dir.path().to_str().map(|s| s.to_owned()) else {
+        return Err("E06 Failed get temp directory path".to_owned());
+    };
+    let file_name = path
+        .as_ref()
+        .file_stem()
+        .ok_or(format!("Invalid path: {:?}", path.as_ref()))?;
+    let file_name = file_name
+        .to_str()
+        .ok_or(format!("Invalid file name: {:?}", path.as_ref()))?
+        .to_owned();
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
     Ok((temp_dir, temp_dir_string, file_name))
@@ -30,16 +42,27 @@ pub fn extract_project(path_contents: &FileContents, temp_dir: &TempDir) -> Resu
     Ok(())
 }
 
-pub fn project_edit_loop(mut skip_first: bool, config: &Config, temp_dir: &TempDir, temp_dir_string: &str, file_name: &str) -> Result<Option<Vec<u8>>, String> {
+pub fn project_edit_loop(
+    mut skip_first: bool,
+    config: &Config,
+    temp_dir: &TempDir,
+    temp_dir_string: &str,
+    file_name: &str,
+) -> Result<Option<Vec<u8>>, String> {
     Ok(loop {
         if !skip_first {
             println!("Opening editor... ");
-            if let Err(e) = config.rust_project_edit_command().to_command(Some(temp_dir_string))?.output() {
-                return Err(format!("E49 Error when running project edit command: {}\n\
+            if let Err(e) = config
+                .rust_project_edit_command()
+                .to_command(Some(temp_dir_string))?
+                .output()
+            {
+                return Err(format!(
+                    "E49 Error when running project edit command: {}\n\
                     Check/edit the command used in '{}'.\n  - \
                     If you have your config edit program correctly configured use `rss config` to modify the config",
-                                   e,
-                                   get_config_path()?.as_os_str().to_string_lossy()
+                    e,
+                    get_config_path()?.as_os_str().to_string_lossy()
                 ));
             }
         }
@@ -68,8 +91,7 @@ pub fn project_edit_loop(mut skip_first: bool, config: &Config, temp_dir: &TempD
             if input.to_ascii_lowercase().trim() != "y" {
                 break None;
             }
-        }
-        else {
+        } else {
             let binary_path = temp_dir.path().join("target");
 
             let binary_path = if *config.use_debug_mode() {
@@ -87,7 +109,8 @@ pub fn project_edit_loop(mut skip_first: bool, config: &Config, temp_dir: &TempD
 
             print!("Reading built binary... ");
             let start = Instant::now();
-            let binary = fs::read(&binary_path).map_err(|e| format!("E12 Failed to read file {binary_path:?}: {}", e))?;
+            let binary = fs::read(&binary_path)
+                .map_err(|e| format!("E12 Failed to read file {binary_path:?}: {}", e))?;
             let time = Instant::now() - start;
             cprintln!("<cyan>[{:?}]</>", time);
             break Some(binary);
