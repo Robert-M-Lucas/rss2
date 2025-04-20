@@ -36,7 +36,11 @@ pub fn project_edit_loop(mut skip_first: bool, config: &Config, temp_dir: &TempD
             println!("Opening editor... ");
             if let Err(e) = config.rust_project_edit_command().to_command(Some(temp_dir_string))?.output() {
                 return Err(format!("E49 Error when running project edit command: {}\n\
-                    Check/edit the command used in '{}'.", e, get_config_path()?.as_os_str().to_string_lossy()));
+                    Check/edit the command used in '{}'.\n  - \
+                    If you have your config edit program correctly configured use `rss config` to modify the config",
+                                   e,
+                                   get_config_path()?.as_os_str().to_string_lossy()
+                ));
             }
         }
         skip_first = false;

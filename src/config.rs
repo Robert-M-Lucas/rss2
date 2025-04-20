@@ -1,6 +1,6 @@
 pub mod edit_command;
 
-use color_print::{cprint, cprintln};
+use color_print::cprintln;
 use derive_getters::Getters;
 use directories::BaseDirs;
 use edit_command::EditCommand;
