@@ -10,9 +10,6 @@ pub struct RssArgs {
 
 #[derive(Parser, Debug)]
 pub enum RssSubcommand {
-    #[command(about = "Read the README")]
-    Readme,
-
     #[command(about = "Runs an rss file")]
     Run {
         #[arg(help = "File to run")]
@@ -25,9 +22,23 @@ pub enum RssSubcommand {
         file: String,
     },
 
+    #[command(about = "Change config options")]
+    Config {
+        #[arg(short, long, action, help = "Reset config to default")]
+        reset: bool,
+        #[arg(short, long, action, help = "Outputs the config file location")]
+        r#where: bool,
+    },
+
     #[command(about = "Strips the compiled binary from an rss file")]
     Strip {
         #[arg(help = "File to strip")]
+        file: String,
+    },
+
+    #[command(about = "Extracts the Rust project from the rss file")]
+    Extract {
+        #[arg(help = "File to extract")]
         file: String,
     },
 
@@ -37,11 +48,6 @@ pub enum RssSubcommand {
         file: String,
     },
 
-    #[command(about = "Change config options")]
-    Config {
-        #[arg(short, long, action, help = "Reset config to default")]
-        reset: bool,
-        #[arg(short, long, action, help = "Outputs the config file location")]
-        r#where: bool,
-    },
+    #[command(about = "Read the README")]
+    Readme,
 }

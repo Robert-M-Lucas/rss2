@@ -1,6 +1,7 @@
 mod args;
 mod config;
 mod edit;
+mod extract;
 mod md_reader;
 mod recompile;
 mod run;
@@ -10,6 +11,7 @@ pub mod util;
 use crate::args::{RssArgs, RssSubcommand};
 use crate::config::{edit_config, get_config, get_config_path, reset_config};
 use crate::edit::edit;
+use crate::extract::extract;
 use crate::md_reader::md_reader;
 use crate::recompile::recompile;
 use crate::run::run;
@@ -75,6 +77,10 @@ fn wrapped_main() -> Result<(), String> {
                 println!("Reset config to:\n{json}");
                 println!("Reset config at '{p}'");
             }
+        }
+        RssSubcommand::Extract { file } => {
+            let config = get_config()?;
+            extract(&config, file)?;
         }
     }
 

@@ -33,10 +33,13 @@ pub fn create_temp_project_dir<P: AsRef<Path>>(
     Ok((temp_dir, temp_dir_string, file_name))
 }
 
-pub fn extract_project(path_contents: &FileContents, temp_dir: &TempDir) -> Result<(), String> {
+pub fn extract_project<P: AsRef<Path>>(
+    path_contents: &FileContents,
+    temp_dir: P,
+) -> Result<(), String> {
     print!("Extracting project... ");
     let start = Instant::now();
-    unzip_from_bytes(path_contents.zipped_contents(), temp_dir.path())?;
+    unzip_from_bytes(path_contents.zipped_contents(), temp_dir.as_ref())?;
     let time = Instant::now() - start;
     cprintln!("<cyan>[{:?}]</>", time);
     Ok(())

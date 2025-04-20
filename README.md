@@ -30,9 +30,12 @@ A `cr-origin.sh/cmd` script will automatically be created allowing you to `cargo
 rss run myfile.rss
 ```
 
+## Cross Compatability
+The platform a binary was compiled for is automatically saved. Should this not match the current platform, the file will be automatically recompiled.
+
 ## Other Commands
 - Remove the compiled binary part of a file: `rss strip myfile.rss`
 - Recompile a file: `rss recompile myfile.rss`
-
-## Cross Compatability
-The platform a binary was compiled for is automatically saved. Should this not match the current platform, the file will be automatically recompiled.
+- Extract the Rust source from an rss file: `rss extract myfile.rss`
+- Read this README: `rss readme`
+- Command help: `rss help`
