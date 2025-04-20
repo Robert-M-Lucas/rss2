@@ -68,6 +68,7 @@ edition = \"2024\"
             make_executable(&cr_origin)?;
             true
         } else {
+            cprintln!("<yellow>Not creating cr-orig.sh as it already exists!</>");
             false
         };
     }
@@ -101,6 +102,7 @@ edition = \"2024\"
             make_executable(&cr_origin)?;
             true
         } else {
+            cprintln!("<yellow>Not creating cr-orig.cmd as it already exists!</>");
             false
         };
     }

@@ -1,6 +1,7 @@
 use std::borrow::Cow;
 use std::path::Path;
 use std::fs;
+use color_print::cprintln;
 use human_bytes::human_bytes;
 
 type LengthType = u64;
@@ -40,10 +41,10 @@ impl FileContents {
     }
 
     pub fn print_stats(&self) {
-        println!("Project zip size: {}", human_bytes(self.zip_length as f64));
-        println!("Target triple indicator size: {}", human_bytes(self.triple_length as f64));
-        println!("Binary size: {}", human_bytes((self.contents.len() - self.zip_length - LENGTH_TYPE_SIZE) as f64));
-        println!("Total size: {}", human_bytes(self.contents.len() as f64));
+        cprintln!("Project zip size: <cyan>{}</>", human_bytes(self.zip_length as f64));
+        cprintln!("Target triple indicator size: <cyan>{}</>", human_bytes(self.triple_length as f64));
+        cprintln!("Binary size: <cyan>{}</>", human_bytes((self.contents.len() - self.zip_length - LENGTH_TYPE_SIZE) as f64));
+        cprintln!("Total size: <cyan>{}</>", human_bytes(self.contents.len() as f64));
     }
 
     pub fn from_path<P: AsRef<Path>>(path: P) -> Result<Option<FileContents>, String> {
