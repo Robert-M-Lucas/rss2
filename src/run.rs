@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::util::executable::make_executable;
 use crate::util::file_contents::FileContents;
-use crate::{target_triple, time};
+use crate::{VERBOSE, target_triple, time};
 use std::fs;
 use std::path::Path;
 use std::process::Command;
@@ -15,7 +15,7 @@ pub enum RunParam<P: AsRef<Path>> {
 pub fn run<P: AsRef<Path>>(
     _config: &Config,
     run_param: RunParam<P>,
-) -> Result<Option<String>, String> {
+) -> Result<Result<i32, String>, String> {
     let mut _maybe_path_contents = None;
     let bin = match &run_param {
         RunParam::Path(path) => {
@@ -23,11 +23,11 @@ pub fn run<P: AsRef<Path>>(
                 .ok_or(format!("E36 File contents not found: {:?}", path.as_ref()))?;
 
             if path_contents.bin_contents().is_empty() {
-                return Ok(Some("rss file has no binary".to_owned()));
+                return Ok(Err("rss file has no binary".to_owned()));
             }
 
             if path_contents.target_triple() != target_triple() {
-                return Ok(Some(format!(
+                return Ok(Err(format!(
                     "File compiled for target '{}', whereas current target is '{}'",
                     path_contents.target_triple(),
                     target_triple()
@@ -56,16 +56,25 @@ pub fn run<P: AsRef<Path>>(
         .keep()
         .map_err(|e| format!("E41 Failed to mark binary as non-temporary {:?}", e))?;
 
-    println!("Running binary...\n");
+    if *VERBOSE.get().unwrap() {
+        println!("Running binary...");
+    }
+
     let status = Command::new(&temp_exe_path)
         .status()
         .map_err(|e| format!("E39 Failed to run binary: {:?}", e))?;
 
-    if let Some(code) = status.code() {
-        println!("\nExited with code {code}");
+    let code = if let Some(code) = status.code() {
+        if *VERBOSE.get().unwrap() {
+            println!("\nExited with code {code}");
+        }
+        code
     } else {
-        println!("\nExited with no exit code");
-    }
+        if *VERBOSE.get().unwrap() {
+            println!("\nExited with no exit code");
+        }
+        0
+    };
 
     time!(
         "Removing temporary file",
@@ -73,5 +82,5 @@ pub fn run<P: AsRef<Path>>(
         fs::remove_file(temp_exe_path).map_err(|e| format!("E42 Temp file deletion error: {:?}", e))?;
     );
 
-    Ok(None)
+    Ok(Ok(code))
 }

@@ -19,6 +19,7 @@ use crate::strip::strip;
 use clap::Parser;
 use color_print::cprintln;
 use std::path::PathBuf;
+use std::process::exit;
 use std::sync::OnceLock;
 
 /// Statically fetches target triple emitted in build.rs
@@ -50,13 +51,23 @@ fn wrapped_main() -> Result<(), String> {
             let binary_exists = run(&config, RunParam::Path(file))?;
 
             // Build and re-run if binary doesn't exist
-            if let Some(no_binary_reason) = binary_exists {
-                cprintln!("<yellow, bold>[!] {no_binary_reason} - recompiling...</>");
-                let compiled_binary = recompile(&config, file)?;
-                if let Some(compiled_binary) = compiled_binary {
-                    run(&config, RunParam::<String>::Binary(compiled_binary))?;
+            let code = match binary_exists {
+                Ok(code) => code,
+                Err(no_binary_reason) => {
+                    cprintln!("<yellow, bold>[!] {no_binary_reason} - recompiling...</>");
+                    let compiled_binary = recompile(&config, file)?;
+                    if let Some(compiled_binary) = compiled_binary {
+                        if !VERBOSE.get().unwrap() {
+                            println!("Running binary...");
+                        }
+                        run(&config, RunParam::<String>::Binary(compiled_binary))?.unwrap_or(-1)
+                    } else {
+                        -1
+                    }
                 }
-            }
+            };
+
+            exit(code);
         }
         RssSubcommand::Edit { file } => {
             let config = get_config()?;
