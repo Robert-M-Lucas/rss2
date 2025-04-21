@@ -1,9 +1,9 @@
+use crate::time;
 use color_print::{cprint, cprintln};
 use human_bytes::human_bytes;
 use std::borrow::Cow;
 use std::fs;
 use std::path::Path;
-use std::time::Instant;
 
 type LengthType = u64;
 const LENGTH_TYPE_SIZE: usize = size_of::<LengthType>();
@@ -93,11 +93,11 @@ impl FileContents {
         if !path.as_ref().exists() {
             return Ok(None);
         }
-        print!("Reading rss file... ");
-        let start = Instant::now();
-        let contents = fs::read(&path).map_err(|e| format!("E07 Failed to read file: {}", e))?;
-        let time = Instant::now() - start;
-        cprintln!("<cyan>[{:?}]</>", time);
+        let contents = time!(
+            "Reading rss file... ",
+            fs::read(&path).map_err(|e| format!("E07 Failed to read file: {}", e))?
+        );
+
         if contents.len() < 8 {
             return Err(format!("Corrupted file: {:?} [E1]", path.as_ref()));
         }

@@ -1,4 +1,5 @@
 use crate::config::{Config, get_config_path};
+use crate::time;
 use crate::util::file_contents::FileContents;
 use crate::util::zip::unzip_from_bytes;
 use color_print::cprintln;
@@ -6,17 +7,16 @@ use std::fs;
 use std::io::Write;
 use std::path::Path;
 use std::process::Command;
-use std::time::Instant;
 use tempfile::TempDir;
 
 pub fn create_temp_project_dir<P: AsRef<Path>>(
     path: P,
 ) -> Result<(TempDir, String, String), String> {
-    print!("Creating temporary directory... ");
-    let start = Instant::now();
-    let Ok(temp_dir) = TempDir::new() else {
-        return Err("E05 Failed to create temp directory".to_owned());
-    };
+    let temp_dir = time!(
+        "Creating temporary directory... ",
+        TempDir::new().map_err(|e| format!("E05 Failed to create temp directory: {e}"))?
+    );
+
     let Some(temp_dir_string) = temp_dir.path().to_str().map(|s| s.to_owned()) else {
         return Err("E06 Failed get temp directory path".to_owned());
     };
@@ -28,8 +28,7 @@ pub fn create_temp_project_dir<P: AsRef<Path>>(
         .to_str()
         .ok_or(format!("Invalid file name: {:?}", path.as_ref()))?
         .to_owned();
-    let time = Instant::now() - start;
-    cprintln!("<cyan>[{:?}]</>", time);
+
     Ok((temp_dir, temp_dir_string, file_name))
 }
 
@@ -37,11 +36,10 @@ pub fn extract_project<P: AsRef<Path>>(
     path_contents: &FileContents,
     temp_dir: P,
 ) -> Result<(), String> {
-    print!("Extracting project... ");
-    let start = Instant::now();
-    unzip_from_bytes(path_contents.zipped_contents(), temp_dir.as_ref())?;
-    let time = Instant::now() - start;
-    cprintln!("<cyan>[{:?}]</>", time);
+    time!(
+        "Extracting project... ",
+        unzip_from_bytes(path_contents.zipped_contents(), temp_dir.as_ref())?;
+    );
     Ok(())
 }
 
@@ -116,12 +114,12 @@ pub fn project_edit_loop(
             #[cfg(not(any(unix, windows)))]
             compile_error!("This crate only supports Unix or Windows targets.");
 
-            print!("Reading built binary... ");
-            let start = Instant::now();
-            let binary = fs::read(&binary_path)
-                .map_err(|e| format!("E12 Failed to read file {binary_path:?}: {}", e))?;
-            let time = Instant::now() - start;
-            cprintln!("<cyan>[{:?}]</>", time);
+            let binary = time!(
+                "Reading built binary... ",
+                fs::read(&binary_path)
+                    .map_err(|e| format!("E12 Failed to read file {binary_path:?}: {}", e))?
+            );
+
             break Some(binary);
         }
     })

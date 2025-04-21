@@ -14,12 +14,13 @@ use crate::edit::edit;
 use crate::extract::extract;
 use crate::md_reader::md_reader;
 use crate::recompile::recompile;
-use crate::run::{run, RunParam};
+use crate::run::{RunParam, run};
 use crate::strip::strip;
 use clap::Parser;
 use color_print::cprintln;
 use std::path::PathBuf;
 
+/// Statically fetches target triple emitted in build.rs
 const fn target_triple() -> &'static str {
     env!("TARGET")
 }
@@ -43,6 +44,8 @@ fn wrapped_main() -> Result<(), String> {
         RssSubcommand::Run { file } => {
             let config = get_config()?;
             let binary_exists = run(&config, RunParam::Path(file))?;
+
+            // Build and re-run if binary doesn't exist
             if let Some(no_binary_reason) = binary_exists {
                 cprintln!("<yellow, bold>[!] {no_binary_reason} - recompiling...</>");
                 let compiled_binary = recompile(&config, file)?;
@@ -65,14 +68,17 @@ fn wrapped_main() -> Result<(), String> {
         }
         RssSubcommand::Config { reset, r#where } => {
             if !reset && !r#where {
+                // Normal config
                 let config = get_config()?;
                 edit_config(&config)?;
             } else if *r#where && !reset {
+                // Where
                 println!(
                     "Config at '{}'",
                     get_config_path()?.as_os_str().to_string_lossy()
                 );
             } else {
+                // Reset
                 let (p, json) = reset_config()?;
                 println!("Reset config to:\n{json}");
                 println!("Reset config at '{p}'");

@@ -1,29 +1,29 @@
 use crate::config::Config;
-use crate::target_triple;
 use crate::util::executable::make_executable;
 use crate::util::file_contents::FileContents;
-use color_print::cprintln;
+use crate::{target_triple, time};
 use std::fs;
 use std::path::Path;
 use std::process::Command;
-use std::time::Instant;
 use tempfile::NamedTempFile;
 
 pub enum RunParam<P: AsRef<Path>> {
     Path(P),
-    Binary(Vec<u8>)
+    Binary(Vec<u8>),
 }
 
-pub fn run<P: AsRef<Path>>(_config: &Config, run_param: RunParam<P>) -> Result<Option<String>, String> {
+pub fn run<P: AsRef<Path>>(
+    _config: &Config,
+    run_param: RunParam<P>,
+) -> Result<Option<String>, String> {
     let mut _maybe_path_contents = None;
     let bin = match &run_param {
         RunParam::Path(path) => {
-            print!("Reading binary from file... ");
-            let start = Instant::now();
-            let path_contents = FileContents::from_path(&path)?
-                .ok_or(format!("E36 File contents not found: {:?}", path.as_ref()))?;
-            let time = Instant::now() - start;
-            cprintln!("<cyan>[{:?}]</>", time);
+            let path_contents = time!(
+                "Reading binary from file... ",
+                FileContents::from_path(&path)?
+                    .ok_or(format!("E36 File contents not found: {:?}", path.as_ref()))?
+            );
 
             if path_contents.bin_contents().len() == 0 {
                 return Ok(Some("rss file has no binary".to_owned()));
@@ -39,21 +39,17 @@ pub fn run<P: AsRef<Path>>(_config: &Config, run_param: RunParam<P>) -> Result<O
             _maybe_path_contents = Some(path_contents);
             _maybe_path_contents.as_ref().unwrap().bin_contents()
         }
-        RunParam::Binary(b) => {
-            &b
-        }
+        RunParam::Binary(b) => &b,
     };
-
 
     let temp_exe =
         NamedTempFile::new().map_err(|e| format!("E37 Temp file creation error: {:?}", e))?;
 
-    print!("Writing binary to temporary file... ");
-    let start = Instant::now();
-    fs::write(temp_exe.path(), bin)
+    time!(
+        "Writing binary to temporary file... ",
+        fs::write(temp_exe.path(), bin)
         .map_err(|e| format!("E38 Temp file creation error: {:?}", e))?;
-    let time = Instant::now() - start;
-    cprintln!("<cyan>[{:?}]</>", time);
+    );
 
     make_executable(&temp_exe)?;
 
@@ -73,11 +69,10 @@ pub fn run<P: AsRef<Path>>(_config: &Config, run_param: RunParam<P>) -> Result<O
         println!("\nExited with no exit code");
     }
 
-    print!("Removing temporary file... ");
-    let start = Instant::now();
-    fs::remove_file(temp_exe_path).map_err(|e| format!("E42 Temp file deletion error: {:?}", e))?;
-    let time = Instant::now() - start;
-    cprintln!("<cyan>[{:?}]</>", time);
+    time!(
+        "Removing temporary file... ",
+        fs::remove_file(temp_exe_path).map_err(|e| format!("E42 Temp file deletion error: {:?}", e))?;
+    );
 
     Ok(None)
 }

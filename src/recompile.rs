@@ -1,12 +1,11 @@
 use crate::config::Config;
-use crate::target_triple;
 use crate::util::edit_recompile_shared::{
     create_temp_project_dir, extract_project, project_edit_loop,
 };
 use crate::util::file_contents::FileContents;
-use color_print::{cprint, cprintln};
+use crate::{target_triple, time};
+use color_print::{cformat, cprintln};
 use std::path::Path;
-use std::time::Instant;
 
 pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<Option<Vec<u8>>, String> {
     let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
@@ -30,12 +29,12 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<Option<Vec<
         return Ok(Some(binary));
     }
 
-    cprint!("Writing binary ({}) to rss file... ", target_triple());
     path_contents.replace_binary(target_triple(), &binary);
-    let start = Instant::now();
-    path_contents.save(&path)?;
-    let time = Instant::now() - start;
-    cprintln!("<cyan>[{:?}]</>", time);
+    time!(
+        cformat!("Writing binary ({}) to rss file... ", target_triple()),
+        path_contents.save(&path)?;
+    );
+
     path_contents.print_stats(
         &path
             .as_ref()

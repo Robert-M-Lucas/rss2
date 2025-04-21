@@ -1,5 +1,6 @@
 pub mod edit_command;
 
+use crate::{print_task_start, println_task_duration, time};
 use color_print::cprintln;
 use derive_getters::Getters;
 use directories::BaseDirs;
@@ -52,7 +53,7 @@ pub fn get_config_path() -> Result<PathBuf, String> {
 
 pub fn get_config() -> Result<Config, String> {
     let mut cancel_time = false;
-    print!("Fetching config... ");
+    print_task_start!("Fetching config");
     let start = Instant::now();
 
     let config_file = get_config_path()?;
@@ -80,16 +81,17 @@ pub fn get_config() -> Result<Config, String> {
         let config = Config::default();
         let json = serde_json::to_string_pretty(&config)
             .map_err(|_| "E18 Failed to serialize config".to_owned())?;
-        print!("Writing config... ");
-        let start = Instant::now();
-        fs::write(&config_file, json).map_err(|_| "E19 Failed to write config file".to_owned())?;
-        let time = Instant::now() - start;
-        cprintln!("<cyan>[{:?}]</>", time);
+
+        time!(
+            "Writing config",
+            fs::write(&config_file, json).map_err(|_| "E19 Failed to write config file".to_owned())?;
+        );
+
         config
     });
     if !cancel_time {
-        let time = Instant::now() - start;
-        cprintln!("<cyan>[{:?}]</>", time);
+        let time = start.elapsed();
+        println_task_duration!(time)
     }
     r
 }

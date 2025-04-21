@@ -1,14 +1,13 @@
 use crate::config::Config;
-use crate::target_triple;
 use crate::util::edit_recompile_shared::{
     create_temp_project_dir, extract_project, project_edit_loop,
 };
 use crate::util::executable::make_executable;
 use crate::util::file_contents::FileContents;
 use crate::util::zip::zip_dir_to_bytes;
-use color_print::{cprint, cprintln};
+use crate::{target_triple, time};
+use color_print::{cformat, cprintln};
 use std::path::Path;
-use std::time::Instant;
 use std::{env, fs};
 
 pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
@@ -20,18 +19,17 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     if let Some(path_contents) = path_contents {
         extract_project(&path_contents, &temp_dir)?;
     } else {
-        print!("Creating default project... ");
-        let start = Instant::now();
-        fs::write(
+        time!(
+            "Creating default project",
+                fs::write(
             &cargo_path,
             format!(
-                "[package]
-name = \"{file_name}\"
-version = \"0.1.0\"
-edition = \"2024\"
-
-[dependencies]
-"
+                "[package]\n\
+                name = \"{file_name}\"\n\
+                version = \"0.1.0\"\n\
+                edition = \"2024\"\n\
+                \n\
+                [dependencies]\n"
             ),
         )
         .map_err(|e| format!("E09 Failed to create file: {}", e))?;
@@ -42,8 +40,7 @@ edition = \"2024\"
             include_str!("static/main.txt"),
         )
         .map_err(|e| format!("E11 Failed to create file: {}", e))?;
-        let time = Instant::now() - start;
-        cprintln!("<cyan>[{:?}]</>", time);
+        );
     }
 
     let cwd = env::current_dir()
@@ -69,14 +66,12 @@ edition = \"2024\"
                 )
             };
 
-            cprint!(
-                "Creating cr-orig.sh (<yellow, bold>this file will be deleted when saving!</>)... "
+            time!(
+                cformat!("Creating cr-orig.sh (<yellow, bold>this file will be deleted when saving!</>)... "),
+                fs::write(&cr_origin, &bash_script)
+                    .map_err(|e| format!("E50 Failed to create cr-origin script: {}", e))?;
             );
-            let start = Instant::now();
-            fs::write(&cr_origin, &bash_script)
-                .map_err(|e| format!("E50 Failed to create cr-origin script: {}", e))?;
-            let time = Instant::now() - start;
-            cprintln!("<cyan>[{:?}]</>", time);
+
             make_executable(&cr_origin)?;
             true
         } else {
@@ -103,13 +98,12 @@ edition = \"2024\"
                 )
             };
 
-            cprint!(
-                "Creating cr-orig.cmd (<yellow, bold>this file will be deleted when saving!</>)... "
+            time!(
+                cformat!("Creating cr-orig.cmd (<yellow, bold>this file will be deleted when saving!</>)... "),
+                fs::write(&cr_origin, &bash_script)
+                    .map_err(|e| format!("E54 Failed to create cr-origin script: {}", e))?;
             );
-            let start = Instant::now();
-            fs::write(&cr_origin, &bash_script)
-                .map_err(|e| format!("E54 Failed to create cr-origin script: {}", e))?;
-            let time = Instant::now() - start;
+
             cprintln!("<cyan>[{:?}]</>", time);
             make_executable(&cr_origin)?;
             true
@@ -119,44 +113,48 @@ edition = \"2024\"
         };
     }
 
-    let binary = project_edit_loop(false, !*config.never_save_binary(), config, &temp_dir, &temp_dir_string, &file_name)?;
+    let binary = project_edit_loop(
+        false,
+        !*config.never_save_binary(),
+        config,
+        &temp_dir,
+        &temp_dir_string,
+        &file_name,
+    )?;
 
     if binary.is_some() {
-        print!("Cleaning up target directory... ");
-        let start = Instant::now();
-        fs::remove_dir_all(temp_dir.path().join("target"))
+        time!(
+            "Cleaning up target directory... ",
+            fs::remove_dir_all(temp_dir.path().join("target"))
             .map_err(|e| format!("E35 Failed to remove temporary directory: {}", e))?;
-        let time = Instant::now() - start;
-        cprintln!("<cyan>[{:?}]</>", time);
+        );
     }
 
     if delete_cr_origin {
-        print!("Deleting cr-origin... ");
-        let start = Instant::now();
-        fs::remove_file(&cr_origin).map_err(|e| format!("E51 Failed to delete file: {}", e))?;
-        let time = Instant::now() - start;
-        cprintln!("<cyan>[{:?}]</>", time);
+        time!(
+            "Deleting cr-origin... ",
+            fs::remove_file(&cr_origin).map_err(|e| format!("E51 Failed to delete file: {}", e))?;
+        );
     }
 
-    print!("Zipping project... ");
-    let start = Instant::now();
-    let project_zip = zip_dir_to_bytes(temp_dir)?;
-    let time = Instant::now() - start;
-    cprintln!("<cyan>[{:?}]</>", time);
+    let project_zip = time!("Zipping project... ", zip_dir_to_bytes(temp_dir)?);
 
-    if binary.is_some() {
-        cprint!(
+    let write_description = if binary.is_some() {
+        cformat!(
             "Writing rss file <green, bold>(project and binary - {})</>... ",
             target_triple()
-        );
+        )
     } else {
-        cprint!("Writing rss file <red, bold>(no binary)</>... ");
-    }
+        cformat!("Writing rss file <red, bold>(no binary)</>... ")
+    };
+
     let file_contents = FileContents::new(project_zip, binary.unwrap_or(vec![]), target_triple());
-    let start = Instant::now();
-    file_contents.save(&path)?;
-    let time = Instant::now() - start;
-    cprintln!("<cyan>[{:?}]</>", time);
+
+    time!(
+        write_description,
+        file_contents.save(&path)?;
+    );
+
     file_contents.print_stats(
         &path
             .as_ref()
