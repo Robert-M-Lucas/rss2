@@ -14,6 +14,7 @@ use std::time::Instant;
 
 #[derive(Serialize, Deserialize, Debug, Getters)]
 #[serde(default)]
+#[derive(Default)]
 pub struct Config {
     config_edit_command: EditCommand,
     rust_project_edit_command: EditCommand,
@@ -44,7 +45,7 @@ impl Config {
 }
 
 pub fn get_config_path() -> Result<PathBuf, String> {
-    let Some(config_dir) = BaseDirs::new().and_then(|bd| Some(bd.config_dir().to_owned())) else {
+    let Some(config_dir) = BaseDirs::new().map(|bd| bd.config_dir().to_owned()) else {
         return Err("E03 Failed to get config directory".to_owned());
     };
 
@@ -113,7 +114,7 @@ pub fn edit_config(config: &Config) -> Result<(), String> {
     println!("Opening editor...");
     if let Err(e) = config
         .config_edit_command()
-        .to_command(Some(&config_path))?
+        .to_command(Some(config_path))?
         .output()
     {
         return Err(format!(

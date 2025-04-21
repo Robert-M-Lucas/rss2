@@ -7,11 +7,11 @@ pub mod zip;
 macro_rules! time {
     ($description:expr, $($tts:tt)*) => {
         {
-            crate::print_task_start!($description);
+            $crate::print_task_start!($description);
             let start = std::time::Instant::now();
             let val = {$($tts)*};
             let time = start.elapsed();
-            crate::println_task_duration!(time);
+            $crate::println_task_duration!(time);
             val
         }
     };
@@ -20,11 +20,11 @@ macro_rules! time {
 #[macro_export]
 macro_rules! time_no_scope {
     ($description:expr, $($tts:tt)*) => {
-        crate::print_task_start!($description);
+        $crate::print_task_start!($description);
         let start = std::time::Instant::now();
         $($tts)*;
         let time = start.elapsed();
-        crate::println_task_duration!(time)
+        $crate::println_task_duration!(time)
     };
 }
 

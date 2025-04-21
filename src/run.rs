@@ -21,11 +21,11 @@ pub fn run<P: AsRef<Path>>(
         RunParam::Path(path) => {
             let path_contents = time!(
                 "Reading binary from file... ",
-                FileContents::from_path(&path)?
+                FileContents::from_path(path)?
                     .ok_or(format!("E36 File contents not found: {:?}", path.as_ref()))?
             );
 
-            if path_contents.bin_contents().len() == 0 {
+            if path_contents.bin_contents().is_empty() {
                 return Ok(Some("rss file has no binary".to_owned()));
             }
 
@@ -39,7 +39,7 @@ pub fn run<P: AsRef<Path>>(
             _maybe_path_contents = Some(path_contents);
             _maybe_path_contents.as_ref().unwrap().bin_contents()
         }
-        RunParam::Binary(b) => &b,
+        RunParam::Binary(b) => b,
     };
 
     let temp_exe =

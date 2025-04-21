@@ -22,7 +22,7 @@ impl FileContents {
             .extend_from_slice((zipped_contents.len() as LengthType).to_le_bytes().as_ref()); // zipped len
         final_contents.extend_from_slice(&zipped_contents); // zipped
         final_contents.extend_from_slice(
-            (triple.as_bytes().len() as LengthType)
+            (triple.len() as LengthType)
                 .to_le_bytes()
                 .as_ref(),
         ); // triple len
@@ -30,7 +30,7 @@ impl FileContents {
         final_contents.extend_from_slice(&binary_contents); // binary
         FileContents {
             contents: final_contents,
-            triple_length: triple.as_bytes().len(),
+            triple_length: triple.len(),
             zip_length: zipped_contents.len(),
         }
     }
@@ -42,9 +42,9 @@ impl FileContents {
 
     pub fn replace_binary(&mut self, triple: &str, binary: &[u8]) {
         self.contents.truncate(LENGTH_TYPE_SIZE + self.zip_length);
-        self.triple_length = triple.as_bytes().len();
+        self.triple_length = triple.len();
         self.contents.extend_from_slice(
-            (triple.as_bytes().len() as LengthType)
+            (triple.len() as LengthType)
                 .to_le_bytes()
                 .as_ref(),
         ); // triple len
