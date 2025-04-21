@@ -18,7 +18,7 @@ macro_rules! time {
 }
 
 #[macro_export]
-macro_rules! time_no_scope {
+macro_rules! time_leak_scope {
     ($description:expr, $($tts:tt)*) => {
         $crate::print_task_start!($description);
         let start = std::time::Instant::now();
