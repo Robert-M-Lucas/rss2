@@ -14,7 +14,6 @@ use std::time::Instant;
 
 #[derive(Serialize, Deserialize, Debug, Getters)]
 #[serde(default)]
-#[derive(Default)]
 pub struct Config {
     config_edit_command: EditCommand,
     rust_project_edit_command: EditCommand,
@@ -22,6 +21,7 @@ pub struct Config {
     never_save_binary: bool,
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for Config {
     fn default() -> Self {
         Config {
