@@ -8,7 +8,7 @@ use color_print::{cprint, cprintln};
 use std::path::Path;
 use std::time::Instant;
 
-pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<bool, String> {
+pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<Option<Vec<u8>>, String> {
     let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
 
     let mut path_contents = FileContents::from_path(&path)?
@@ -16,14 +16,19 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<bool, Strin
 
     extract_project(&path_contents, &temp_dir)?;
 
-    let binary = project_edit_loop(true, config, &temp_dir, &temp_dir_string, &file_name)?;
+    let binary = project_edit_loop(true, true, config, &temp_dir, &temp_dir_string, &file_name)?;
 
     let Some(binary) = binary else {
         cprintln!(
             "<red, bold>Failed to compile binary. Use `rss strip [file]` to remove the existing binary.</>"
         );
-        return Ok(false);
+        return Ok(None);
     };
+
+    if *config.never_save_binary() {
+        cprintln!("<yellow, bold>Not saving compiled binary due to config</>");
+        return Ok(Some(binary));
+    }
 
     cprint!("Writing binary ({}) to rss file... ", target_triple());
     path_contents.replace_binary(target_triple(), &binary);
@@ -39,5 +44,5 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<bool, Strin
             .to_string_lossy(),
     );
 
-    Ok(true)
+    Ok(Some(binary))
 }

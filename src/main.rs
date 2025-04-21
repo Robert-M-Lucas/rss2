@@ -14,7 +14,7 @@ use crate::edit::edit;
 use crate::extract::extract;
 use crate::md_reader::md_reader;
 use crate::recompile::recompile;
-use crate::run::run;
+use crate::run::{run, RunParam};
 use crate::strip::strip;
 use clap::Parser;
 use color_print::cprintln;
@@ -42,12 +42,12 @@ fn wrapped_main() -> Result<(), String> {
         }
         RssSubcommand::Run { file } => {
             let config = get_config()?;
-            let binary_exists = run(&config, file)?;
+            let binary_exists = run(&config, RunParam::Path(file))?;
             if let Some(no_binary_reason) = binary_exists {
                 cprintln!("<yellow, bold>[!] {no_binary_reason} - recompiling...</>");
-                let compile_succeeded = recompile(&config, file)?;
-                if compile_succeeded {
-                    run(&config, file)?;
+                let compiled_binary = recompile(&config, file)?;
+                if let Some(compiled_binary) = compiled_binary {
+                    run(&config, RunParam::<String>::Binary(compiled_binary))?;
                 }
             }
         }

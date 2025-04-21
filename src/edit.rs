@@ -80,7 +80,7 @@ edition = \"2024\"
             make_executable(&cr_origin)?;
             true
         } else {
-            cprintln!("<yellow>Not creating cr-orig.sh as it already exists!</>");
+            cprintln!("<yellow, bold>Not creating cr-orig.sh as it already exists!</>");
             false
         };
     }
@@ -114,19 +114,21 @@ edition = \"2024\"
             make_executable(&cr_origin)?;
             true
         } else {
-            cprintln!("<yellow>Not creating cr-orig.cmd as it already exists!</>");
+            cprintln!("<yellow, bold>Not creating cr-orig.cmd as it already exists!</>");
             false
         };
     }
 
-    let binary = project_edit_loop(false, config, &temp_dir, &temp_dir_string, &file_name)?;
+    let binary = project_edit_loop(false, !*config.never_save_binary(), config, &temp_dir, &temp_dir_string, &file_name)?;
 
-    print!("Cleaning up target directory... ");
-    let start = Instant::now();
-    fs::remove_dir_all(temp_dir.path().join("target"))
-        .map_err(|e| format!("E35 Failed to remove temporary directory: {}", e))?;
-    let time = Instant::now() - start;
-    cprintln!("<cyan>[{:?}]</>", time);
+    if binary.is_some() {
+        print!("Cleaning up target directory... ");
+        let start = Instant::now();
+        fs::remove_dir_all(temp_dir.path().join("target"))
+            .map_err(|e| format!("E35 Failed to remove temporary directory: {}", e))?;
+        let time = Instant::now() - start;
+        cprintln!("<cyan>[{:?}]</>", time);
+    }
 
     if delete_cr_origin {
         print!("Deleting cr-origin... ");

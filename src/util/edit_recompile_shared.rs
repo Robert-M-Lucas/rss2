@@ -47,6 +47,7 @@ pub fn extract_project<P: AsRef<Path>>(
 
 pub fn project_edit_loop(
     mut skip_first: bool,
+    compile_binary: bool,
     config: &Config,
     temp_dir: &TempDir,
     temp_dir_string: &str,
@@ -70,6 +71,11 @@ pub fn project_edit_loop(
             }
         }
         skip_first = false;
+
+        if !compile_binary {
+            cprintln!("<yellow, bold>Not compiling binary due to config</>");
+            return Ok(None);
+        }
 
         let args: &[&str] = if *config.use_debug_mode() {
             println!("Building binary (debug)... ");

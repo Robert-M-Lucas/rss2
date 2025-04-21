@@ -17,6 +17,7 @@ pub struct Config {
     config_edit_command: EditCommand,
     rust_project_edit_command: EditCommand,
     use_debug_mode: bool,
+    never_save_binary: bool,
 }
 
 impl Default for Config {
@@ -25,6 +26,7 @@ impl Default for Config {
             config_edit_command: Default::default(),
             rust_project_edit_command: Default::default(),
             use_debug_mode: false,
+            never_save_binary: false,
         }
     }
 }
@@ -69,7 +71,7 @@ pub fn get_config() -> Result<Config, String> {
             get_config_path()?.as_os_str().to_string_lossy()
         );
         cprintln!(
-            "<yellow, bold>IMPORTANT: Change the editor in the config if you do not have VS Code in path!</>"
+            "<yellow, bold>[!] Change the editor in the config if you do not have VS Code in path!</>"
         );
         print!("Press enter to continue...");
         stdout().flush().ok();
@@ -106,6 +108,7 @@ pub fn edit_config(config: &Config) -> Result<(), String> {
     let Some(config_path) = config_path.to_str().to_owned() else {
         return Err("E02 Failed to get config path".to_owned());
     };
+    println!("Opening editor...");
     if let Err(e) = config
         .config_edit_command()
         .to_command(Some(&config_path))?
