@@ -37,9 +37,15 @@ impl EditCommand {
 
 impl Default for EditCommand {
     fn default() -> Self {
-        EditCommand {
+        #[cfg(unix)]
+        return EditCommand {
             command: "code".to_owned(),
             args: vec!["-w".to_owned(), "$$$".to_owned()],
-        }
+        };
+        #[cfg(windows)]
+        return EditCommand {
+            command: "code.cmd".to_owned(),
+            args: vec!["-w".to_owned(), "$$$".to_owned()],
+        };
     }
 }

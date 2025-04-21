@@ -1,10 +1,14 @@
+#[cfg(unix)]
 use color_print::cprintln;
+#[cfg(unix)]
 use std::fs;
+#[cfg(unix)]
 use std::fs::Permissions;
 #[cfg(unix)]
 use std::os::unix::fs::PermissionsExt;
-use std::path::Path;
+#[cfg(unix)]
 use std::time::Instant;
+use std::path::Path;
 
 pub fn make_executable<P: AsRef<Path>>(file: P) -> Result<(), String> {
     #[cfg(unix)]
@@ -20,5 +24,7 @@ pub fn make_executable<P: AsRef<Path>>(file: P) -> Result<(), String> {
         let time = Instant::now() - start;
         cprintln!("<cyan>[{:?}]</>", time);
     }
+    #[cfg(windows)]
+    let _ = file;
     Ok(())
 }
