@@ -19,11 +19,14 @@ use crate::strip::strip;
 use clap::Parser;
 use color_print::cprintln;
 use std::path::PathBuf;
+use std::sync::OnceLock;
 
 /// Statically fetches target triple emitted in build.rs
 const fn target_triple() -> &'static str {
     env!("TARGET")
 }
+
+pub static VERBOSE: OnceLock<bool> = OnceLock::new();
 
 fn main() {
     #[cfg(all(not(windows), not(unix)))]
@@ -36,6 +39,7 @@ fn main() {
 
 fn wrapped_main() -> Result<(), String> {
     let args = RssArgs::parse();
+    VERBOSE.set(*args.verbose()).unwrap();
 
     match args.subcommand() {
         RssSubcommand::Readme => {

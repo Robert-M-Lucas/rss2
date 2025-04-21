@@ -13,7 +13,8 @@ pub fn create_temp_project_dir<P: AsRef<Path>>(
     path: P,
 ) -> Result<(TempDir, String, String), String> {
     let temp_dir = time!(
-        "Creating temporary directory... ",
+        "Creating temporary directory",
+        false,
         TempDir::new().map_err(|e| format!("E05 Failed to create temp directory: {e}"))?
     );
 
@@ -37,7 +38,8 @@ pub fn extract_project<P: AsRef<Path>>(
     temp_dir: P,
 ) -> Result<(), String> {
     time!(
-        "Extracting project... ",
+        "Extracting project",
+        false,
         unzip_from_bytes(path_contents.zipped_contents(), temp_dir.as_ref())?;
     );
     Ok(())
@@ -115,7 +117,8 @@ pub fn project_edit_loop(
             compile_error!("This crate only supports Unix or Windows targets.");
 
             let binary = time!(
-                "Reading built binary... ",
+                "Reading built binary",
+                false,
                 fs::read(&binary_path)
                     .map_err(|e| format!("E12 Failed to read file {binary_path:?}: {}", e))?
             );

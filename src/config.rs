@@ -1,6 +1,6 @@
 pub mod edit_command;
 
-use crate::{print_task_start, println_task_duration, time};
+use crate::{VERBOSE, print_task_start, println_task_duration, time};
 use color_print::cprintln;
 use derive_getters::Getters;
 use directories::BaseDirs;
@@ -54,7 +54,10 @@ pub fn get_config_path() -> Result<PathBuf, String> {
 
 pub fn get_config() -> Result<Config, String> {
     let mut cancel_time = false;
-    print_task_start!("Fetching config");
+    if *VERBOSE.get().unwrap() {
+        print_task_start!("Fetching config");
+    }
+
     let start = Instant::now();
 
     let config_file = get_config_path()?;
@@ -85,6 +88,7 @@ pub fn get_config() -> Result<Config, String> {
 
         time!(
             "Writing config",
+            false,
             fs::write(&config_file, json).map_err(|_| "E19 Failed to write config file".to_owned())?;
         );
 
@@ -92,7 +96,9 @@ pub fn get_config() -> Result<Config, String> {
     });
     if !cancel_time {
         let time = start.elapsed();
-        println_task_duration!(time)
+        if *VERBOSE.get().unwrap() {
+            println_task_duration!(time)
+        }
     }
     r
 }

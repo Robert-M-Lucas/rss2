@@ -19,11 +19,8 @@ pub fn run<P: AsRef<Path>>(
     let mut _maybe_path_contents = None;
     let bin = match &run_param {
         RunParam::Path(path) => {
-            let path_contents = time!(
-                "Reading binary from file... ",
-                FileContents::from_path(path)?
-                    .ok_or(format!("E36 File contents not found: {:?}", path.as_ref()))?
-            );
+            let path_contents = FileContents::from_path(path)?
+                .ok_or(format!("E36 File contents not found: {:?}", path.as_ref()))?;
 
             if path_contents.bin_contents().is_empty() {
                 return Ok(Some("rss file has no binary".to_owned()));
@@ -46,7 +43,8 @@ pub fn run<P: AsRef<Path>>(
         NamedTempFile::new().map_err(|e| format!("E37 Temp file creation error: {:?}", e))?;
 
     time!(
-        "Writing binary to temporary file... ",
+        "Writing binary to temporary file",
+        false,
         fs::write(temp_exe.path(), bin)
         .map_err(|e| format!("E38 Temp file creation error: {:?}", e))?;
     );
@@ -70,7 +68,8 @@ pub fn run<P: AsRef<Path>>(
     }
 
     time!(
-        "Removing temporary file... ",
+        "Removing temporary file",
+        false,
         fs::remove_file(temp_exe_path).map_err(|e| format!("E42 Temp file deletion error: {:?}", e))?;
     );
 

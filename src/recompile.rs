@@ -31,7 +31,8 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<Option<Vec<
 
     path_contents.replace_binary(target_triple(), &binary);
     time!(
-        cformat!("Writing binary ({}) to rss file... ", target_triple()),
+        cformat!("Writing binary ({}) to rss file", target_triple()),
+        false,
         path_contents.save(&path)?;
     );
 

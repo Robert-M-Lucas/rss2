@@ -13,7 +13,8 @@ pub fn make_executable<P: AsRef<Path>>(file: P) -> Result<(), String> {
     #[cfg(unix)]
     {
         time!(
-            "Making file executable... ",
+            "Making file executable",
+            false,
             let current_mode = fs::metadata(file.as_ref())
                 .map_err(|e| format!("E59 Failed to get file permission ({e})"))?
                 .permissions();

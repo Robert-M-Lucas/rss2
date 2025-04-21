@@ -5,13 +5,20 @@ pub mod zip;
 
 #[macro_export]
 macro_rules! time {
-    ($description:expr, $($tts:tt)*) => {
+    ($description:expr, $important:expr, $($tts:tt)*) => {
         {
-            $crate::print_task_start!($description);
+            if ($important) || (*$crate::VERBOSE.get().unwrap()) {
+                $crate::print_task_start!($description);
+            }
             let start = std::time::Instant::now();
             let val = {$($tts)*};
             let time = start.elapsed();
-            $crate::println_task_duration!(time);
+            if (*$crate::VERBOSE.get().unwrap()) {
+                $crate::println_task_duration!(time);
+            }
+            else if $important {
+                println!();
+            }
             val
         }
     };
@@ -19,12 +26,19 @@ macro_rules! time {
 
 #[macro_export]
 macro_rules! time_leak_scope {
-    ($description:expr, $($tts:tt)*) => {
-        $crate::print_task_start!($description);
+    ($description:expr, $important:expr, $($tts:tt)*) => {
+        if ($important) || (*$crate::VERBOSE.get().unwrap()) {
+            $crate::print_task_start!($description);
+        }
         let start = std::time::Instant::now();
         $($tts)*;
         let time = start.elapsed();
-        $crate::println_task_duration!(time)
+        if (*$crate::VERBOSE.get().unwrap()) {
+                $crate::println_task_duration!(time);
+            }
+            else if $important {
+                println!();
+            }
     };
 }
 

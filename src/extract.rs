@@ -22,7 +22,8 @@ pub fn extract<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> 
         );
 
     time!(
-        "Creating directory... ",
+        "Creating directory",
+        false,
         fs::create_dir(&dir).map_err(|e| {
         format!(
             "E65 Could not create directory '{}' - {e}",

@@ -87,7 +87,8 @@ impl FileContents {
             return Ok(None);
         }
         let contents = time!(
-            "Reading rss file... ",
+            "Reading rss file",
+            false,
             fs::read(&path).map_err(|e| format!("E07 Failed to read file: {}", e))?
         );
 

@@ -6,6 +6,8 @@ use derive_getters::Getters;
 pub struct RssArgs {
     #[command(subcommand)]
     subcommand: RssSubcommand,
+    #[arg(short, long, action, help = "Print additional information")]
+    verbose: bool,
 }
 
 #[derive(Parser, Debug)]

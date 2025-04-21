@@ -21,6 +21,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     } else {
         time!(
             "Creating default project",
+            true,
                 fs::write(
             &cargo_path,
             format!(
@@ -67,7 +68,8 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
             };
 
             time!(
-                cformat!("Creating cr-orig.sh (<yellow, bold>this file will be deleted when saving!</>)... "),
+                cformat!("Creating cr-orig.sh (<yellow, bold>this file will be deleted when saving!</>)"),
+                false,
                 fs::write(&cr_origin, &bash_script)
                     .map_err(|e| format!("E50 Failed to create cr-origin script: {}", e))?;
             );
@@ -99,7 +101,8 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
             };
 
             time!(
-                cformat!("Creating cr-orig.cmd (<yellow, bold>this file will be deleted when saving!</>)... "),
+                cformat!("Creating cr-orig.cmd (<yellow, bold>this file will be deleted when saving!</>)"),
+                false,
                 fs::write(&cr_origin, &bash_script)
                     .map_err(|e| format!("E54 Failed to create cr-origin script: {}", e))?;
             );
@@ -124,7 +127,8 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
 
     if binary.is_some() {
         time!(
-            "Cleaning up target directory... ",
+            "Cleaning up target directory",
+            false,
             fs::remove_dir_all(temp_dir.path().join("target"))
             .map_err(|e| format!("E35 Failed to remove temporary directory: {}", e))?;
         );
@@ -132,12 +136,13 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
 
     if delete_cr_origin {
         time!(
-            "Deleting cr-origin... ",
+            "Deleting cr-origin",
+            false,
             fs::remove_file(&cr_origin).map_err(|e| format!("E51 Failed to delete file: {}", e))?;
         );
     }
 
-    let project_zip = time!("Zipping project... ", zip_dir_to_bytes(temp_dir)?);
+    let project_zip = time!("Zipping project", false, zip_dir_to_bytes(temp_dir)?);
 
     let write_description = if binary.is_some() {
         cformat!(
@@ -152,6 +157,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
 
     time!(
         write_description,
+        false,
         file_contents.save(&path)?;
     );
 

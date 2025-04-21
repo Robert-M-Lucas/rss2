@@ -5,7 +5,8 @@ use std::path::Path;
 
 pub fn strip<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
     let mut path_contents = time!(
-        "Reading file... ",
+        "Reading file",
+        false,
         FileContents::from_path(&path)?
             .ok_or(format!("E44 File contents not found: {:?}", path.as_ref()))?
     );
@@ -13,7 +14,8 @@ pub fn strip<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
     path_contents.remove_binary();
 
     time!(
-        "Saving stripped file... ",
+        "Saving stripped file",
+        false,
         path_contents.save(&path)?;
     );
 
