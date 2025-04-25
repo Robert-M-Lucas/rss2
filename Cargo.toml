@@ -1,9 +1,9 @@
 [package]
 name = "rs-script"
-version = "0.2.14"
+version = "0.2.15"
 edition = "2024"
 authors = ["Robert Lucas <100799838+Robert-M-Lucas@users.noreply.github.com>"]
-description = "A tool to create Rust scripts"
+description = "A tool to create and edit single-file Rust scripts"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/Robert-M-Lucas/rss2"
 

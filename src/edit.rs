@@ -57,12 +57,12 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
 
             let bash_script = if *config.use_debug_mode() {
                 format!(
-                    "#!/bin/sh\n cd '{}'\ncargo run --manifest-path='{}'",
+                    "#!/bin/sh\n cd '{}'\ncargo run --manifest-path='{}' \"$@\"",
                     escaped_path, escaped_temp_cargo_path
                 )
             } else {
                 format!(
-                    "#!/bin/sh\ncd '{}'\ncargo run -r --manifest-path='{}'",
+                    "#!/bin/sh\ncd '{}'\ncargo run -r --manifest-path='{}' \"$@\"",
                     escaped_path, escaped_temp_cargo_path
                 )
             };
@@ -90,12 +90,12 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
 
             let bash_script = if *config.use_debug_mode() {
                 format!(
-                    "cd /d \"{}\"\r\ncargo run --manifest-path=\"{}\"",
+                    "@echo off\r\ncd /d \"{}\"\r\ncargo run --manifest-path=\"{}\" %*",
                     escaped_path, escaped_temp_cargo_path
                 )
             } else {
                 format!(
-                    "cd /d \"{}\"\r\ncargo run -r --manifest-path=\"{}\"",
+                    "@echo off\r\ncd /d \"{}\"\r\ncargo run -r --manifest-path=\"{}\" %*",
                     escaped_path, escaped_temp_cargo_path
                 )
             };
