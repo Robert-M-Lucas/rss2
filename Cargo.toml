@@ -6,6 +6,7 @@ authors = ["Robert Lucas <100799838+Robert-M-Lucas@users.noreply.github.com>"]
 description = "A tool to create and edit single-file Rust scripts"
 license = "MIT OR Apache-2.0"
 repository = "https://github.com/Robert-M-Lucas/rss2"
+default-run = "rss"
 
 [dependencies]
 clap = { version = "4.5.37", features = ["derive"] }
@@ -26,4 +27,8 @@ build-target = "0.4.0"
 
 [[bin]]
 name = "rss"
+path = "src/main.rs"
+
+[[bin]]
+name = "rs-script"
 path = "src/main.rs"
