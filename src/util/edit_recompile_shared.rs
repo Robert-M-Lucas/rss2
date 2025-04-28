@@ -57,7 +57,7 @@ pub fn project_edit_loop(
         if !skip_first {
             println!("Opening editor... ");
             if let Err(e) = config
-                .rust_project_edit_command()
+                .rust_project_edit_command_blocking()
                 .to_command(Some(temp_dir_string))?
                 .output()
             {

@@ -16,7 +16,7 @@ use std::time::Instant;
 #[serde(default)]
 pub struct Config {
     config_edit_command: EditCommand,
-    rust_project_edit_command: EditCommand,
+    rust_project_edit_command_blocking: EditCommand,
     use_debug_mode: bool,
     never_save_binary: bool,
 }
@@ -26,7 +26,7 @@ impl Default for Config {
     fn default() -> Self {
         Config {
             config_edit_command: Default::default(),
-            rust_project_edit_command: Default::default(),
+            rust_project_edit_command_blocking: Default::default(),
             use_debug_mode: false,
             never_save_binary: false,
         }
