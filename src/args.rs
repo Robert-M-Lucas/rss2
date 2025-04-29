@@ -57,6 +57,8 @@ pub enum RssSubcommand {
         #[arg(help = "File to recompile")]
         file: String,
     },
+    
+    // tree, cat
 
     #[command(about = "Read the README")]
     Readme,
