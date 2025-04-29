@@ -107,7 +107,6 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
                     .map_err(|e| format!("E54 Failed to create cr-origin script: {}", e))?;
             );
 
-            cprintln!("<cyan>[{:?}]</>", time);
             make_executable(&cr_origin)?;
             true
         } else {

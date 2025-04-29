@@ -69,6 +69,7 @@ impl Default for EditCommand {
         return EditCommand {
             command: "code.cmd".to_owned(),
             args: vec!["-w".to_owned(), PATH_REPLACE_ARG.to_owned()],
+            inherit_shell: false,
         };
     }
 }
