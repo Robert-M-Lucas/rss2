@@ -1,11 +1,9 @@
 use crate::config::Config;
-use crate::util::edit_recompile_shared::{
-    create_temp_project_dir, extract_project, project_edit_loop,
-};
+use crate::util::edit_recompile_shared::project_edit_loop;
 use crate::util::file_contents::FileContents;
 use crate::util::zip::zip_dir_to_bytes;
 use crate::{target_triple, time};
-use color_print::{cformat, cprintln};
+use color_print::cformat;
 use std::fs;
 use std::path::Path;
 

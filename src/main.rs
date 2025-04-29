@@ -60,7 +60,7 @@ fn wrapped_main() -> Result<(), String> {
         }
         RssSubcommand::Run { file, args } => {
             let config = get_config()?;
-            let binary_exists = run(&config, RunParam::Path(&file), &args)?;
+            let binary_exists = run(&config, RunParam::Path(&file), args)?;
 
             // Build and re-run if binary doesn't exist
             let code = match binary_exists {
@@ -72,7 +72,8 @@ fn wrapped_main() -> Result<(), String> {
                         if !VERBOSE.get().unwrap() {
                             println!("Running binary...");
                         }
-                        run(&config, RunParam::<String>::Binary(compiled_binary), &args)?.unwrap_or(-1)
+                        run(&config, RunParam::<String>::Binary(compiled_binary), args)?
+                            .unwrap_or(-1)
                     } else {
                         -1
                     }
