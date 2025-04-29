@@ -13,6 +13,7 @@ clap = { version = "4.5.37", features = ["derive"] }
 color-print = "0.3.7"
 derive-getters = "0.5.0"
 directories = "6.0.0"
+either = "1.15.0"
 human_bytes = "0.4.3"
 ratatui = "0.29.0"
 serde = { version = "1.0.219", features = ["derive"] }

@@ -56,15 +56,15 @@ pub fn project_edit_loop(
     Ok(loop {
         if !skip_first {
             println!("Opening editor... ");
+
             if let Err(e) = config
                 .rust_project_edit_command_blocking()
-                .to_command(Some(temp_dir_string))?
-                .output()
+                .run_command(Some(temp_dir_string))?
             {
                 return Err(format!(
                     "E49 Error when running project edit command: {}\n\
-                    Check/edit the command used in '{}'.\n  - \
-                    If you have your config edit program correctly configured use `rss config` to modify the config",
+                Check/edit the command used in '{}'.\n  - \
+                If you have your config edit program correctly configured use `rss config` to modify the config",
                     e,
                     get_config_path()?.as_os_str().to_string_lossy()
                 ));

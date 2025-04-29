@@ -1168,6 +1168,7 @@ dependencies = [
  "color-print",
  "derive-getters",
  "directories",
+ "either",
  "human_bytes",
  "ratatui",
  "serde",

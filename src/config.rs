@@ -118,17 +118,18 @@ pub fn edit_config(config: &Config) -> Result<(), String> {
         return Err("E02 Failed to get config path".to_owned());
     };
     println!("Opening editor...");
+
     if let Err(e) = config
         .config_edit_command()
-        .to_command(Some(config_path))?
-        .output()
+        .run_command(Some(config_path))?
     {
         return Err(format!(
             "E48 Error when running config edit command: {}\n\
-        Check/edit the command used in '{}'.",
+    Check/edit the command used in '{}'.",
             e,
             get_config_path()?.as_os_str().to_string_lossy()
         ));
     }
+
     Ok(())
 }
