@@ -15,7 +15,7 @@ const LAYOUT_VERSION_SIZE: usize = size_of::<LayoutVersionType>();
 
 // ! List of layout versions and newest rs-script version that supports them
 // ! Last entry is the current layout version
-const LAYOUT_VERSIONS: [(LayoutVersionType, &str); 1] = [(1, "0.2.17")];
+const LAYOUT_VERSIONS: [(LayoutVersionType, &str); 1] = [(1, "0.2.18")];
 #[allow(dead_code)]
 const fn version_check() -> bool {
     slice_eq!(

@@ -1,7 +1,5 @@
 # RS-Script
 
-> !! Changes before 1.0.0 may be breaking !!
-
 Stores all the files and the built binary of a Rust project in a single file allowing similar usage to Python scripts.
 
 ## Installation
@@ -52,5 +50,6 @@ The platform a binary was compiled for is automatically saved. Should this not m
 - Remove the compiled binary part of a file: `rss strip myfile.rss`
 - Recompile a file: `rss recompile myfile.rss`
 - Extract the Rust source from an rss file: `rss extract myfile.rss`
+- Create an rss file from an existing rust project: `rss pack project_dir`
 - Read this README: `rss readme`
 - Command help: `rss help`
