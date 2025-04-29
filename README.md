@@ -25,7 +25,7 @@ Example nvim configuration:
 "rust_project_edit_command_blocking": {
     "command": "nvim",
     "args": [
-      "$$$"
+      "$dir$"
     ],
     "inherit_shell": true
 }
