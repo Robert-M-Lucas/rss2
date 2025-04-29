@@ -16,6 +16,8 @@ pub enum RssSubcommand {
     Run {
         #[arg(help = "File to run")]
         file: String,
+        #[arg(trailing_var_arg = true, help = "Arguments to pass to the program")]
+        args: Vec<String>,
     },
 
     #[command(about = "Edit/create an rss file")]
@@ -42,6 +44,12 @@ pub enum RssSubcommand {
     Extract {
         #[arg(help = "File to extract")]
         file: String,
+    },
+
+    #[command(about = "Creates an rss file from a Rust project")]
+    Pack {
+        #[arg(help = "Rust project folder")]
+        directory: String,
     },
 
     #[command(about = "Recompile the compiled binary for an rss file")]

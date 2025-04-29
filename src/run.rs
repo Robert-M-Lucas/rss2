@@ -15,6 +15,7 @@ pub enum RunParam<P: AsRef<Path>> {
 pub fn run<P: AsRef<Path>>(
     _config: &Config,
     run_param: RunParam<P>,
+    args: &[String],
 ) -> Result<Result<i32, String>, String> {
     let mut _maybe_path_contents = None;
     let bin = match &run_param {
@@ -61,6 +62,7 @@ pub fn run<P: AsRef<Path>>(
     }
 
     let status = Command::new(&temp_exe_path)
+        .args(args)
         .status()
         .map_err(|e| format!("E39 Failed to run binary: {:?}", e))?;
 

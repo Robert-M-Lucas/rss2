@@ -45,11 +45,11 @@ pub fn extract_project<P: AsRef<Path>>(
     Ok(())
 }
 
-pub fn project_edit_loop(
+pub fn project_edit_loop<P: AsRef<Path>>(
     mut skip_first: bool,
     compile_binary: bool,
     config: &Config,
-    temp_dir: &TempDir,
+    temp_dir: P,
     temp_dir_string: &str,
     file_name: &str,
 ) -> Result<Option<Vec<u8>>, String> {
@@ -86,7 +86,7 @@ pub fn project_edit_loop(
         };
 
         let output = Command::new("cargo")
-            .current_dir(temp_dir.path())
+            .current_dir(temp_dir.as_ref())
             .args(args)
             .status();
         let output = output.map_err(|e| format!("Error when running binary command: {}", e))?;
@@ -101,7 +101,7 @@ pub fn project_edit_loop(
                 break None;
             }
         } else {
-            let binary_path = temp_dir.path().join("target");
+            let binary_path = temp_dir.as_ref().join("target");
 
             let binary_path = if *config.use_debug_mode() {
                 binary_path.join("debug")

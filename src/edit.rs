@@ -125,12 +125,13 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
         &file_name,
     )?;
 
-    if binary.is_some() {
+    let target_dir = temp_dir.path().join("target");
+    if target_dir.exists() {
         time!(
             "Cleaning up target directory",
             false,
-            fs::remove_dir_all(temp_dir.path().join("target"))
-            .map_err(|e| format!("E35 Failed to remove temporary directory: {}", e))?;
+            fs::remove_dir_all(target_dir)
+            .map_err(|e| format!("E35 Failed to remove target directory: {}", e))?;
         );
     }
 

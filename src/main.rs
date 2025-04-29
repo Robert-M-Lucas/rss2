@@ -3,6 +3,7 @@ mod config;
 mod edit;
 mod extract;
 mod md_reader;
+mod pack;
 mod recompile;
 mod run;
 mod strip;
@@ -13,6 +14,7 @@ use crate::config::{edit_config, get_config, get_config_path, reset_config};
 use crate::edit::edit;
 use crate::extract::extract;
 use crate::md_reader::md_reader;
+use crate::pack::pack;
 use crate::recompile::recompile;
 use crate::run::{RunParam, run};
 use crate::strip::strip;
@@ -56,9 +58,9 @@ fn wrapped_main() -> Result<(), String> {
         RssSubcommand::Readme => {
             md_reader(include_str!("../README.md"))?;
         }
-        RssSubcommand::Run { file } => {
+        RssSubcommand::Run { file, args } => {
             let config = get_config()?;
-            let binary_exists = run(&config, RunParam::Path(file))?;
+            let binary_exists = run(&config, RunParam::Path(&file), &args)?;
 
             // Build and re-run if binary doesn't exist
             let code = match binary_exists {
@@ -70,7 +72,7 @@ fn wrapped_main() -> Result<(), String> {
                         if !VERBOSE.get().unwrap() {
                             println!("Running binary...");
                         }
-                        run(&config, RunParam::<String>::Binary(compiled_binary))?.unwrap_or(-1)
+                        run(&config, RunParam::<String>::Binary(compiled_binary), &args)?.unwrap_or(-1)
                     } else {
                         -1
                     }
@@ -112,6 +114,10 @@ fn wrapped_main() -> Result<(), String> {
         RssSubcommand::Extract { file } => {
             let config = get_config()?;
             extract(&config, file)?;
+        }
+        RssSubcommand::Pack { directory } => {
+            let config = get_config()?;
+            pack(&config, directory)?;
         }
     }
 
