@@ -42,7 +42,7 @@ fn check_layout_version(layout_version: LayoutVersionType) -> Result<(), String>
                 If the file was created by a version before 0.2.17, extract the project in that version and repack it in the latest version.",
                 env!("CARGO_PKG_VERSION")
             ))
-        }
+        };
     }
     Ok(())
 }
