@@ -3,6 +3,8 @@ use either::{Either, Right};
 use serde::{Deserialize, Serialize};
 use std::process::{Command, ExitStatus, Output};
 
+const PATH_REPLACE_ARG: &str = "$dir$";
+
 #[derive(Debug, Serialize, Deserialize, Getters)]
 #[serde(default)]
 pub struct EditCommand {
@@ -18,12 +20,14 @@ impl EditCommand {
 
         let mut inserted = false;
         for arg in &self.args {
-            if arg == "$$$" {
+            if arg == PATH_REPLACE_ARG {
                 if let Some(insert) = insert {
                     command.arg(insert);
                     inserted = true;
                 } else {
-                    return Err("E01 Found $$$ in command with no insertion".to_owned());
+                    return Err(format!(
+                        "E01 Found `{PATH_REPLACE_ARG}` in command with no insertion"
+                    ));
                 }
             } else {
                 command = command.arg(arg);
@@ -31,7 +35,9 @@ impl EditCommand {
         }
 
         if insert.is_some() && !inserted {
-            return Err("E04 One argument must be '$$$' for argument insertion".to_owned());
+            return Err(format!(
+                "E04 One argument must be `{PATH_REPLACE_ARG}` for directory argument insertion. Check your config file."
+            ));
         }
         Ok(o_command)
     }
@@ -56,13 +62,13 @@ impl Default for EditCommand {
         #[cfg(unix)]
         return EditCommand {
             command: "code".to_owned(),
-            args: vec!["-w".to_owned(), "$$$".to_owned()],
+            args: vec!["-w".to_owned(), PATH_REPLACE_ARG.to_owned()],
             inherit_shell: false,
         };
         #[cfg(windows)]
         return EditCommand {
             command: "code.cmd".to_owned(),
-            args: vec!["-w".to_owned(), "$$$".to_owned()],
+            args: vec!["-w".to_owned(), PATH_REPLACE_ARG.to_owned()],
         };
     }
 }
