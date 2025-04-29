@@ -10,13 +10,26 @@ cargo install rs-script
 ```
 
 ## Config
-> A large number of commands will not work if you don't have an editor configured in the config file!
+A large number of commands will not work if you don't have an editor configured in the config file!
 
 - Find the config file: `rss config -w`
-> You will need to manually edit this file if you don't have the default editor 
+
+You will need to manually edit this file if you don't have the default editor 
 
 - Modify the config with: `rss config`
-> This uses the editor configured in the config file
+
+This uses the editor configured in the config file
+
+Example nvim configuration:
+```json
+"rust_project_edit_command_blocking": {
+    "command": "nvim",
+    "args": [
+      "$$$"
+    ],
+    "inherit_shell": true
+}
+```
 
 - Reset the config file: `rss config -r`
 

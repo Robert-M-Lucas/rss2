@@ -43,10 +43,10 @@ impl EditCommand {
         let mut command = self.to_command(insert)?;
         if self.inherit_shell {
             let result = command.status();
-            Ok(result.map(|e| Either::Left(e)))
+            Ok(result.map(Either::Left))
         } else {
             let result = command.output();
-            Ok(result.map(|o| Right(o)))
+            Ok(result.map(Right))
         }
     }
 }
