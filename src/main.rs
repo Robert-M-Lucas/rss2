@@ -2,7 +2,7 @@ mod args;
 mod config;
 mod edit;
 mod extract;
-mod md_reader;
+// mod md_reader;
 mod pack;
 mod recompile;
 mod run;
@@ -13,21 +13,22 @@ use crate::args::{RssArgs, RssSubcommand};
 use crate::config::{edit_config, get_config, get_config_path, reset_config};
 use crate::edit::edit;
 use crate::extract::extract;
-use crate::md_reader::md_reader;
 use crate::pack::pack;
 use crate::recompile::recompile;
 use crate::run::{RunParam, run};
 use crate::strip::strip;
+#[macro_use]
+extern crate static_assertions;
+#[macro_use]
+extern crate const_it;
 use clap::Parser;
 use color_print::cprintln;
 use std::path::PathBuf;
 use std::process::exit;
 use std::sync::OnceLock;
 
-/// Statically fetches target triple emitted in build.rs
-const fn target_triple() -> &'static str {
-    env!("TARGET")
-}
+const TARGET_TRIPLE: &str = env!("TARGET");
+const RS_SCRIPT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 pub static VERBOSE: OnceLock<bool> = OnceLock::new();
 
@@ -56,7 +57,8 @@ fn wrapped_main() -> Result<(), String> {
 
     match args.subcommand() {
         RssSubcommand::Readme => {
-            md_reader(include_str!("../README.md"))?;
+            // md_reader(include_str!("../README.md"))?;
+            println!("{}", include_str!("../README.md"));
         }
         RssSubcommand::Run { file, args } => {
             let config = get_config()?;

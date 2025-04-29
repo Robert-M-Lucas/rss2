@@ -3,7 +3,7 @@ use crate::util::edit_recompile_shared::{
     create_temp_project_dir, extract_project, project_edit_loop,
 };
 use crate::util::file_contents::FileContents;
-use crate::{target_triple, time};
+use crate::{TARGET_TRIPLE, time};
 use color_print::{cformat, cprintln};
 use std::path::Path;
 
@@ -29,9 +29,9 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<Option<Vec<
         return Ok(Some(binary));
     }
 
-    path_contents.replace_binary(target_triple(), &binary);
+    path_contents.replace_binary(TARGET_TRIPLE, &binary);
     time!(
-        cformat!("Writing binary ({}) to rss file", target_triple()),
+        cformat!("Writing binary ({}) to rss file", TARGET_TRIPLE),
         false,
         path_contents.save(&path)?;
     );

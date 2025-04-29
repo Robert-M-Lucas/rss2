@@ -5,7 +5,7 @@ use crate::util::edit_recompile_shared::{
 use crate::util::executable::make_executable;
 use crate::util::file_contents::FileContents;
 use crate::util::zip::zip_dir_to_bytes;
-use crate::{target_triple, time};
+use crate::{TARGET_TRIPLE, time};
 use color_print::{cformat, cprintln};
 use std::path::Path;
 use std::{env, fs};
@@ -148,13 +148,13 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     let write_description = if binary.is_some() {
         cformat!(
             "Writing rss file <green, bold>(project and binary - {})</>... ",
-            target_triple()
+            TARGET_TRIPLE
         )
     } else {
         cformat!("Writing rss file <red, bold>(no binary)</>... ")
     };
 
-    let file_contents = FileContents::new(project_zip, binary.unwrap_or(vec![]), target_triple());
+    let file_contents = FileContents::new(project_zip, binary.unwrap_or(vec![]), TARGET_TRIPLE);
 
     time!(
         write_description,

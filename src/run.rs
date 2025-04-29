@@ -1,7 +1,7 @@
 use crate::config::Config;
 use crate::util::executable::make_executable;
 use crate::util::file_contents::FileContents;
-use crate::{VERBOSE, target_triple, time};
+use crate::{TARGET_TRIPLE, VERBOSE, time};
 use std::fs;
 use std::path::Path;
 use std::process::Command;
@@ -27,11 +27,11 @@ pub fn run<P: AsRef<Path>>(
                 return Ok(Err("rss file has no binary".to_owned()));
             }
 
-            if path_contents.target_triple() != target_triple() {
+            if path_contents.target_triple() != TARGET_TRIPLE {
                 return Ok(Err(format!(
                     "File compiled for target '{}', whereas current target is '{}'",
                     path_contents.target_triple(),
-                    target_triple()
+                    TARGET_TRIPLE
                 )));
             }
             _maybe_path_contents = Some(path_contents);

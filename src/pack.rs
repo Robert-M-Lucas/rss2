@@ -2,7 +2,7 @@ use crate::config::Config;
 use crate::util::edit_recompile_shared::project_edit_loop;
 use crate::util::file_contents::FileContents;
 use crate::util::zip::zip_dir_to_bytes;
-use crate::{target_triple, time};
+use crate::{TARGET_TRIPLE, time};
 use color_print::cformat;
 use std::fs;
 use std::path::Path;
@@ -44,13 +44,13 @@ pub fn pack<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     let write_description = if binary.is_some() {
         cformat!(
             "Writing rss file <green, bold>(project and binary - {})</>... ",
-            target_triple()
+            TARGET_TRIPLE
         )
     } else {
         cformat!("Writing rss file <red, bold>(no binary)</>... ")
     };
 
-    let file_contents = FileContents::new(project_zip, binary.unwrap_or(vec![]), target_triple());
+    let file_contents = FileContents::new(project_zip, binary.unwrap_or(vec![]), TARGET_TRIPLE);
 
     let file_name = format!("{dir_name}.rss");
     time!(
