@@ -78,10 +78,15 @@ pub enum RssSubcommand {
         name: Option<String>,
         #[arg(short, long, action, help = "Filter files by extension")]
         extension: Option<String>,
-        #[arg(short, long, action, help = "Prints all files (default is only .rs files)")]
+        #[arg(
+            short,
+            long,
+            action,
+            help = "Prints all files (default is only .rs files)"
+        )]
         all: bool,
     },
-    
+
     #[command(about = "Read the README")]
     Readme,
 }

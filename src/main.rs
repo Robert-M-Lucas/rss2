@@ -3,6 +3,7 @@ mod config;
 mod edit;
 mod extract;
 // mod md_reader;
+mod cat;
 mod pack;
 mod recompile;
 mod run;
@@ -10,7 +11,6 @@ mod stats;
 mod strip;
 mod tree;
 pub mod util;
-mod cat;
 
 use crate::args::{RssArgs, RssSubcommand};
 use crate::config::{edit_config, get_config, get_config_path, reset_config};
@@ -24,6 +24,7 @@ use crate::strip::strip;
 extern crate static_assertions;
 #[macro_use]
 extern crate const_it;
+use crate::cat::cat;
 use crate::stats::stats;
 use crate::tree::tree;
 use clap::Parser;
@@ -31,7 +32,6 @@ use color_print::cprintln;
 use std::path::PathBuf;
 use std::process::exit;
 use std::sync::OnceLock;
-use crate::cat::cat;
 
 const TARGET_TRIPLE: &str = env!("TARGET");
 const RS_SCRIPT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -136,9 +136,20 @@ fn wrapped_main() -> Result<(), String> {
             let config = get_config()?;
             tree(&config, file)?;
         }
-        RssSubcommand::Cat { file, name, extension, all } => {
+        RssSubcommand::Cat {
+            file,
+            name,
+            extension,
+            all,
+        } => {
             let config = get_config()?;
-            cat(&config, file, name.as_ref().map(|x| x.as_str()), extension.as_ref().map(|x| x.as_str()), *all)?;
+            cat(
+                &config,
+                file,
+                name.as_ref().map(|x| x.as_str()),
+                extension.as_ref().map(|x| x.as_str()),
+                *all,
+            )?;
         }
     }
 

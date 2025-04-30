@@ -1,9 +1,9 @@
+use color_print::cprintln;
 use std::borrow::Cow;
 use std::fs;
 use std::fs::File;
 use std::io::{BufRead, Cursor, Read, Write};
 use std::path::Path;
-use color_print::cprintln;
 use walkdir::WalkDir;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, ZipArchive, ZipWriter};
@@ -199,23 +199,33 @@ pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
         let mut file = archive
             .by_index(i)
             .map_err(|e| format!("E29 Failed to open archive: {}", e))?;
-        if file.is_dir() { continue; }
+        if file.is_dir() {
+            continue;
+        }
         let path = file.mangled_name();
 
         match &filter {
             Filter::None => {}
             Filter::Name(name) => {
-                if !path.file_name().map(|n| n.to_string_lossy()).is_some_and(|n| &n == name) {
+                if !path
+                    .file_name()
+                    .map(|n| n.to_string_lossy())
+                    .is_some_and(|n| &n == name)
+                {
                     continue;
                 }
             }
             Filter::Extension(extension) => {
-                if !path.extension().map(|e| e.to_string_lossy()).is_some_and(|e| &e == extension) {
+                if !path
+                    .extension()
+                    .map(|e| e.to_string_lossy())
+                    .is_some_and(|e| &e == extension)
+                {
                     continue;
                 }
             }
         }
-        
+
         shown = true;
 
         println!("{}", path.to_string_lossy());
@@ -227,7 +237,7 @@ pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
 
         println!();
     }
-    
+
     if !shown {
         cprintln!("<yellow, bold>No files found</>")
     }
