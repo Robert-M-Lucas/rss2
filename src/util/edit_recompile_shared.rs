@@ -53,6 +53,8 @@ pub fn project_edit_loop<P: AsRef<Path>>(
     temp_dir_string: &str,
     file_name: &str,
 ) -> Result<Option<Vec<u8>>, String> {
+    // TODO: Allow user to choose bin with bin-choice.txt file
+    
     Ok(loop {
         if !skip_first {
             println!("Opening editor... ");
