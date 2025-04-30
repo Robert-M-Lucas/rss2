@@ -1,8 +1,9 @@
 use std::borrow::Cow;
 use std::fs;
 use std::fs::File;
-use std::io::{Cursor, Read, Write};
+use std::io::{BufRead, Cursor, Read, Write};
 use std::path::Path;
+use color_print::cprintln;
 use walkdir::WalkDir;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, ZipArchive, ZipWriter};
@@ -178,6 +179,58 @@ pub fn print_tree(bytes: &[u8], file_name: &str) -> Result<(), String> {
     }
 
     tree.print(true);
+
+    Ok(())
+}
+
+pub enum Filter {
+    None,
+    Name(String),
+    Extension(String),
+}
+
+pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
+    let reader = Cursor::new(bytes);
+    let mut archive =
+        ZipArchive::new(reader).map_err(|e| format!("E28 Failed to open zip: {}", e))?;
+
+    let mut shown = false;
+    for i in 0..archive.len() {
+        let mut file = archive
+            .by_index(i)
+            .map_err(|e| format!("E29 Failed to open archive: {}", e))?;
+        if file.is_dir() { continue; }
+        let path = file.mangled_name();
+
+        match &filter {
+            Filter::None => {}
+            Filter::Name(name) => {
+                if !path.file_name().map(|n| n.to_string_lossy()).is_some_and(|n| &n == name) {
+                    continue;
+                }
+            }
+            Filter::Extension(extension) => {
+                if !path.extension().map(|e| e.to_string_lossy()).is_some_and(|e| &e == extension) {
+                    continue;
+                }
+            }
+        }
+        
+        shown = true;
+
+        println!("{}", path.to_string_lossy());
+
+        let mut lines = std::io::BufReader::new(file).lines();
+        while let Some(Ok(line)) = lines.next() {
+            cprintln!("<cyan>  │ </>{}", line);
+        }
+
+        println!();
+    }
+    
+    if !shown {
+        cprintln!("<yellow, bold>No files found</>")
+    }
 
     Ok(())
 }

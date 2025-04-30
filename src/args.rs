@@ -70,7 +70,18 @@ pub enum RssSubcommand {
         file: String,
     },
 
-    //  cat
+    #[command(about = "Prints the contents of files within an rss file")]
+    Cat {
+        #[arg(help = "Rss file to print file contents of")]
+        file: String,
+        #[arg(short, long, action, help = "Filter files by name")]
+        name: Option<String>,
+        #[arg(short, long, action, help = "Filter files by extension")]
+        extension: Option<String>,
+        #[arg(short, long, action, help = "Prints all files (default is only .rs files)")]
+        all: bool,
+    },
+    
     #[command(about = "Read the README")]
     Readme,
 }
