@@ -196,7 +196,7 @@ pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
 
     let mut shown = false;
     for i in 0..archive.len() {
-        let mut file = archive
+        let file = archive
             .by_index(i)
             .map_err(|e| format!("E29 Failed to open archive: {}", e))?;
         if file.is_dir() {
@@ -207,19 +207,17 @@ pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
         match &filter {
             Filter::None => {}
             Filter::Name(name) => {
-                if !path
+                if path
                     .file_name()
-                    .map(|n| n.to_string_lossy())
-                    .is_some_and(|n| &n == name)
+                    .map(|n| n.to_string_lossy()).is_none_or(|n| &n != name)
                 {
                     continue;
                 }
             }
             Filter::Extension(extension) => {
-                if !path
+                if path
                     .extension()
-                    .map(|e| e.to_string_lossy())
-                    .is_some_and(|e| &e == extension)
+                    .map(|e| e.to_string_lossy()).is_none_or(|e| &e != extension)
                 {
                     continue;
                 }

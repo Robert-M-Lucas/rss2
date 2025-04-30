@@ -1,6 +1,6 @@
 use crate::config::Config;
 use crate::util::file_contents::FileContents;
-use crate::util::zip::{Filter, cat_files, print_tree};
+use crate::util::zip::{Filter, cat_files};
 use color_print::cprintln;
 use std::path::Path;
 
