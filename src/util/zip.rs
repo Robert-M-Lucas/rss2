@@ -1,3 +1,4 @@
+use std::borrow::Cow;
 use std::fs;
 use std::fs::File;
 use std::io::{Cursor, Read, Write};
@@ -82,6 +83,101 @@ pub fn unzip_from_bytes<P: AsRef<Path>>(bytes: &[u8], target_dir: P) -> Result<(
             }
         }
     }
+
+    Ok(())
+}
+
+#[derive(Debug)]
+struct FileTree {
+    name: String,
+    hidden: bool,
+    children: Vec<FileTree>,
+}
+
+impl FileTree {
+    fn new(name: String, hidden: bool) -> Self {
+        Self {
+            name,
+            hidden,
+            children: Vec::new(),
+        }
+    }
+
+    fn add_path(&mut self, new: &[Cow<str>], hidden: bool) {
+        if new.is_empty() {
+            return;
+        }
+        if let Some(tree) = self.children.iter_mut().find(|t| t.name == new[0]) {
+            if new.len() == 1 {
+                tree.hidden = hidden;
+            } else {
+                tree.add_path(&new[1..], hidden);
+            }
+        } else if new.len() == 1 {
+            self.children
+                .push(FileTree::new(new[0].to_string(), hidden));
+        } else {
+            self.children.push(FileTree::new(new[0].to_string(), false));
+            self.children
+                .last_mut()
+                .unwrap()
+                .add_path(&new[1..], hidden);
+        }
+    }
+
+    pub fn print(&self, show_hidden: bool) {
+        self.print_int(String::new(), true, true, show_hidden);
+    }
+
+    fn print_int(&self, prefix: String, is_last: bool, is_top: bool, show_hidden: bool) {
+        if is_top {
+            println!("{}", self.name)
+        } else {
+            println!(
+                "{}{} {}",
+                prefix,
+                if is_last { "└──" } else { "├──" },
+                self.name
+            );
+        }
+
+        let new_prefix = if is_top {
+            String::new()
+        } else {
+            format!("{}{}", prefix, if is_last { "    " } else { "│   " })
+        };
+        let len = self.children.len();
+        for (i, child) in self.children.iter().enumerate() {
+            if !show_hidden && child.hidden {
+                continue;
+            }
+            child.print_int(new_prefix.clone(), i == len - 1, false, show_hidden);
+        }
+    }
+}
+
+pub fn print_tree(bytes: &[u8], file_name: &str) -> Result<(), String> {
+    let reader = Cursor::new(bytes);
+    let mut archive =
+        ZipArchive::new(reader).map_err(|e| format!("E82 Failed to open zip: {}", e))?;
+
+    let mut tree = FileTree::new(file_name.to_string(), false);
+
+    for i in 0..archive.len() {
+        let file = archive
+            .by_index(i)
+            .map_err(|e| format!("E29 Failed to open archive: {}", e))?;
+
+        let mangled = file.mangled_name();
+        let sections = mangled
+            .iter()
+            .map(|s| s.to_string_lossy())
+            .collect::<Vec<_>>();
+
+        tree.add_path(&sections, false);
+    }
+
+    tree.print(true);
 
     Ok(())
 }

@@ -116,12 +116,25 @@ pub fn project_edit_loop<P: AsRef<Path>>(
             #[cfg(not(any(unix, windows)))]
             compile_error!("This crate only supports Unix or Windows targets.");
 
-            let binary = time!(
-                "Reading built binary",
-                false,
-                fs::read(&binary_path)
-                    .map_err(|e| format!("E12 Failed to read file {binary_path:?}: {}", e))?
-            );
+            let binary = time!("Reading built binary", false, fs::read(&binary_path));
+
+            let binary = match binary {
+                Err(e) => {
+                    println!(
+                        "Failed to find built binary at path {:?} ({e})",
+                        binary_path
+                    );
+                    println!("Reopen editor? (y/N): ");
+                    std::io::stdout().flush().unwrap();
+                    let mut input = String::new();
+                    std::io::stdin().read_line(&mut input).unwrap();
+                    if input.to_ascii_lowercase().trim() != "y" {
+                        break None;
+                    }
+                    continue;
+                }
+                Ok(b) => b,
+            };
 
             break Some(binary);
         }

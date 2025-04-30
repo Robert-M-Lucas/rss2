@@ -57,9 +57,20 @@ pub enum RssSubcommand {
         #[arg(help = "File to recompile")]
         file: String,
     },
-    
-    // tree, cat
 
+    #[command(about = "Prints statistics about an rss file")]
+    Stats {
+        #[arg(help = "File to get statistics of")]
+        file: String,
+    },
+
+    #[command(about = "Prints the file tree within an rss file")]
+    Tree {
+        #[arg(help = "File to print tree of")]
+        file: String,
+    },
+
+    //  cat
     #[command(about = "Read the README")]
     Readme,
 }

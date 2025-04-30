@@ -6,7 +6,9 @@ mod extract;
 mod pack;
 mod recompile;
 mod run;
+mod stats;
 mod strip;
+mod tree;
 pub mod util;
 
 use crate::args::{RssArgs, RssSubcommand};
@@ -21,6 +23,8 @@ use crate::strip::strip;
 extern crate static_assertions;
 #[macro_use]
 extern crate const_it;
+use crate::stats::stats;
+use crate::tree::tree;
 use clap::Parser;
 use color_print::cprintln;
 use std::path::PathBuf;
@@ -121,6 +125,14 @@ fn wrapped_main() -> Result<(), String> {
         RssSubcommand::Pack { directory } => {
             let config = get_config()?;
             pack(&config, directory)?;
+        }
+        RssSubcommand::Stats { file } => {
+            let config = get_config()?;
+            stats(&config, file)?;
+        }
+        RssSubcommand::Tree { file } => {
+            let config = get_config()?;
+            tree(&config, file)?;
         }
     }
 
