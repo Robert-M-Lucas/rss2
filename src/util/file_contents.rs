@@ -122,7 +122,7 @@ impl FileContents {
             - self.triple_length;
         let binary_size_str = human_bytes(binary_size as f64);
         let total_size = self.contents.len();
-        let total_size_str = human_bytes(binary_size as f64);
+        let total_size_str = human_bytes(total_size as f64);
         let max_len = *[
             zip_size_str.len(),
             triple_size_str.len(),
