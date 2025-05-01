@@ -1,7 +1,8 @@
-use crate::RS_SCRIPT_VERSION;
 use crate::time;
+use crate::{RS_SCRIPT_VERSION, VERBOSE};
 use color_print::{cprint, cprintln};
 use human_bytes::human_bytes;
+use num_format::{Locale, ToFormattedString};
 use std::borrow::Cow;
 use std::fs;
 use std::path::Path;
@@ -100,33 +101,49 @@ impl FileContents {
     }
 
     pub fn print_stats(&self, file_name: &str) {
+        let verbose = *VERBOSE.get().unwrap();
         cprintln!(
-            "{} <green, bold>(Layout version {})</>:",
+            "{} [Layout: <green, bold>v{}</> | Target: <cyan, bold>{}</>]:",
             file_name,
-            self.layout_version
+            self.layout_version,
+            self.target_triple()
         );
+
+        let verbose_bytes = |bytes: usize| -> String {
+            if verbose {
+                format!(" [{} bytes]", bytes.to_formatted_string(&Locale::en))
+            } else {
+                "".to_owned()
+            }
+        };
+
         cprintln!(
-            "  - Layout version indicator size: <cyan>{}</>",
-            human_bytes(LAYOUT_VERSION_SIZE as f64)
+            "  - Layout indicator size:  <cyan>{}</>{}",
+            human_bytes(LAYOUT_VERSION_SIZE as f64),
+            verbose_bytes(LAYOUT_VERSION_SIZE)
         );
+        let zip_size = LENGTH_TYPE_SIZE + self.zip_length;
         cprintln!(
-            "  - Project zip size: <cyan>{}</>",
-            human_bytes((LENGTH_TYPE_SIZE + self.zip_length) as f64)
+            "  - Project zip size:       <cyan>{}</>{}",
+            human_bytes(zip_size as f64),
+            verbose_bytes(zip_size)
         );
+        let triple_size = LENGTH_TYPE_SIZE + self.triple_length;
         cprintln!(
-            "  - Target triple indicator size: <cyan>{}</>",
-            human_bytes((LENGTH_TYPE_SIZE + self.triple_length) as f64)
+            "  - Target indicator size:  <cyan>{}</>{}",
+            human_bytes(triple_size as f64),
+            verbose_bytes(triple_size)
         );
+        let binary_size = self.contents.len()
+            - LAYOUT_VERSION_SIZE
+            - LENGTH_TYPE_SIZE
+            - self.zip_length
+            - LENGTH_TYPE_SIZE
+            - self.triple_length;
         cprint!(
-            "  - Binary size: <cyan>{}</>",
-            human_bytes(
-                (self.contents.len()
-                    - LAYOUT_VERSION_SIZE
-                    - LENGTH_TYPE_SIZE
-                    - self.zip_length
-                    - LENGTH_TYPE_SIZE
-                    - self.triple_length) as f64
-            )
+            "  - Binary size:            <cyan>{}</>{}",
+            human_bytes(binary_size as f64),
+            verbose_bytes(binary_size)
         );
         if self.contents.len()
             - LAYOUT_VERSION_SIZE
@@ -141,7 +158,7 @@ impl FileContents {
             println!();
         }
         cprintln!(
-            "  Total size: <cyan>{}</>",
+            "  Total size:               <cyan>{}</>",
             human_bytes(self.contents.len() as f64)
         );
     }

@@ -209,7 +209,8 @@ pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
             Filter::Name(name) => {
                 if path
                     .file_name()
-                    .map(|n| n.to_string_lossy()).is_none_or(|n| &n != name)
+                    .map(|n| n.to_string_lossy())
+                    .is_none_or(|n| &n != name)
                 {
                     continue;
                 }
@@ -217,7 +218,8 @@ pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
             Filter::Extension(extension) => {
                 if path
                     .extension()
-                    .map(|e| e.to_string_lossy()).is_none_or(|e| &e != extension)
+                    .map(|e| e.to_string_lossy())
+                    .is_none_or(|e| &e != extension)
                 {
                     continue;
                 }
