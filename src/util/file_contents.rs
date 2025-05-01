@@ -109,9 +109,37 @@ impl FileContents {
             self.target_triple()
         );
 
-        let verbose_bytes = |bytes: usize| -> String {
+        let layout_size_str = human_bytes(LAYOUT_VERSION_SIZE as f64);
+        let zip_size = LENGTH_TYPE_SIZE + self.zip_length;
+        let zip_size_str = human_bytes(zip_size as f64);
+        let triple_size = LENGTH_TYPE_SIZE + self.triple_length;
+        let triple_size_str = human_bytes(triple_size as f64);
+        let binary_size = self.contents.len()
+            - LAYOUT_VERSION_SIZE
+            - LENGTH_TYPE_SIZE
+            - self.zip_length
+            - LENGTH_TYPE_SIZE
+            - self.triple_length;
+        let binary_size_str = human_bytes(binary_size as f64);
+        let total_size = self.contents.len();
+        let total_size_str = human_bytes(binary_size as f64);
+        let max_len = *[
+            zip_size_str.len(),
+            triple_size_str.len(),
+            binary_size_str.len(),
+            total_size_str.len(),
+        ]
+        .iter()
+        .max()
+        .unwrap();
+
+        let verbose_bytes = |bytes: usize, cur_len: usize| -> String {
             if verbose {
-                format!(" [{} bytes]", bytes.to_formatted_string(&Locale::en))
+                format!(
+                    "{} [{} bytes]",
+                    " ".repeat(max_len - cur_len),
+                    bytes.to_formatted_string(&Locale::en)
+                )
             } else {
                 "".to_owned()
             }
@@ -119,47 +147,35 @@ impl FileContents {
 
         cprintln!(
             "  - Layout indicator size:  <cyan>{}</>{}",
-            human_bytes(LAYOUT_VERSION_SIZE as f64),
-            verbose_bytes(LAYOUT_VERSION_SIZE)
+            layout_size_str,
+            verbose_bytes(LAYOUT_VERSION_SIZE, layout_size_str.len())
         );
-        let zip_size = LENGTH_TYPE_SIZE + self.zip_length;
         cprintln!(
             "  - Project zip size:       <cyan>{}</>{}",
-            human_bytes(zip_size as f64),
-            verbose_bytes(zip_size)
+            zip_size_str,
+            verbose_bytes(zip_size, zip_size_str.len())
         );
-        let triple_size = LENGTH_TYPE_SIZE + self.triple_length;
         cprintln!(
             "  - Target indicator size:  <cyan>{}</>{}",
-            human_bytes(triple_size as f64),
-            verbose_bytes(triple_size)
+            triple_size_str,
+            verbose_bytes(triple_size, triple_size_str.len())
         );
-        let binary_size = self.contents.len()
-            - LAYOUT_VERSION_SIZE
-            - LENGTH_TYPE_SIZE
-            - self.zip_length
-            - LENGTH_TYPE_SIZE
-            - self.triple_length;
         cprint!(
             "  - Binary size:            <cyan>{}</>{}",
-            human_bytes(binary_size as f64),
-            verbose_bytes(binary_size)
+            binary_size_str,
+            verbose_bytes(binary_size, binary_size_str.len())
         );
-        if self.contents.len()
-            - LAYOUT_VERSION_SIZE
-            - LENGTH_TYPE_SIZE
-            - self.zip_length
-            - LENGTH_TYPE_SIZE
-            - self.triple_length
-            == 0
-        {
+
+        if binary_size == 0 {
             cprintln!("<red> (no binary)</>");
         } else {
             println!();
         }
+
         cprintln!(
-            "  Total size:               <cyan>{}</>",
-            human_bytes(self.contents.len() as f64)
+            "  Total size:               <cyan>{}</>{}",
+            total_size_str,
+            verbose_bytes(total_size, total_size_str.len())
         );
     }
 
