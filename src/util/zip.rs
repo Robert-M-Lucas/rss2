@@ -231,8 +231,14 @@ pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
         println!("{}", path.to_string_lossy());
 
         let mut lines = std::io::BufReader::new(file).lines();
+        let mut first = true;
         while let Some(Ok(line)) = lines.next() {
-            cprintln!("<cyan>  │ </>{}", line);
+            if first {
+                cprintln!("<cyan>└─┐ </>{}", line);
+                first = false;
+            } else {
+                cprintln!("<cyan>  │ </>{}", line);
+            }
         }
 
         println!();

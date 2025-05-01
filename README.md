@@ -52,5 +52,7 @@ The platform a binary was compiled for is automatically saved. Should this not m
 - Extract the Rust source from an rss file: `rss extract myfile.rss`
 - Create an rss file from an existing rust project: `rss pack project_dir`
 - Print statistics for an rss file: `rss stats myfile.rss`
+- Print the file tree within an rss file: `rss tree myfile.rss`
+- Print the contents of a file / files within an rss file: `rss cat myfile.rss`
 - Read this README: `rss readme`
 - Command help: `rss help`
