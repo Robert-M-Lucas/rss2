@@ -12,7 +12,7 @@ A large number of commands will not work if you don't have an editor configured 
 
 - Find the config file: `rss config -w`
 
-You will need to manually edit this file if you don't have the default editor 
+You will need to manually edit this file if you don't have the default editor
 
 - Modify the config with: `rss config`
 
