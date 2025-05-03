@@ -36,7 +36,7 @@ Example nvim configuration:
 rss edit myfile.rss
 ```
 
-A `cr-origin.sh/cmd` script will automatically be created allowing you to `cargo run` in the original directory for ease of development.
+A `cr-origin.sh/cr-origin.cmd` script will automatically be created allowing you to `cargo run` in the original directory for ease of development.
 
 ## Running
 ```bash
