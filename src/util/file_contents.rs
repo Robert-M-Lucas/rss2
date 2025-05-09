@@ -16,7 +16,7 @@ const LAYOUT_VERSION_SIZE: usize = size_of::<LayoutVersionType>();
 
 // ! List of layout versions and newest rs-script version that supports them
 // ! Last entry is the current layout version
-const LAYOUT_VERSIONS: [(LayoutVersionType, &str); 1] = [(1, "0.2.22")];
+const LAYOUT_VERSIONS: [(LayoutVersionType, &str); 1] = [(1, "0.2.23")];
 #[allow(dead_code)]
 const fn version_check() -> bool {
     slice_eq!(
@@ -104,7 +104,7 @@ impl FileContents {
     pub fn print_stats(&self, file_name: &str) {
         let verbose = *VERBOSE.get().unwrap();
         cprintln!(
-            "{} [Layout: <green, bold>v{}</> | Target: <cyan, bold>{}</>]:",
+            "{} [Layout: <green, bold>v{}</> | Target: <green, bold>{}</>]:",
             file_name,
             self.layout_version,
             self.target_triple()
