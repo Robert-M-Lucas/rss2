@@ -12,7 +12,7 @@ default-run = "rss"
 clap = { version = "4.5.37", features = ["derive"] }
 color-print = "0.3.7"
 const-it = "0.2.0"
-derive-getters = "0.5.0"
+derive-getters = { version = "0.5.0", features = ["auto_copy_getters"] }
 directories = "6.0.0"
 either = "1.15.0"
 human_bytes = "0.4.3"

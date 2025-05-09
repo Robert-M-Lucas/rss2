@@ -10,13 +10,17 @@ use color_print::{cformat, cprintln};
 use std::path::Path;
 use std::{env, fs};
 
-pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
+pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), String> {
     let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
 
     let path_contents = FileContents::from_path(&path)?;
     let cargo_path = temp_dir.path().join("Cargo.toml");
 
     if let Some(path_contents) = path_contents {
+        if new {
+            return Err("Rss file already exists".to_string())
+        }
+        
         extract_project(&path_contents, &temp_dir)?;
     } else {
         time!(
@@ -55,7 +59,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
             let escaped_path = cwd.to_string_lossy().replace('\'', "'\\''");
             let escaped_temp_cargo_path = cargo_path.to_string_lossy().replace('\'', "'\\''");
 
-            let bash_script = if *config.use_debug_mode() {
+            let bash_script = if config.use_debug_mode() {
                 format!(
                     "#!/bin/sh\n cd '{}'\ncargo run --manifest-path='{}' \"$@\"",
                     escaped_path, escaped_temp_cargo_path
@@ -88,7 +92,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
             let escaped_path = cwd.to_string_lossy().replace('"', "\"\"");
             let escaped_temp_cargo_path = cargo_path.to_string_lossy().replace('"', "\"\"");
 
-            let bash_script = if *config.use_debug_mode() {
+            let bash_script = if config.use_debug_mode() {
                 format!(
                     "@echo off\r\ncd /d \"{}\"\r\ncargo run --manifest-path=\"{}\" %*",
                     escaped_path, escaped_temp_cargo_path
@@ -117,7 +121,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
 
     let binary = project_edit_loop(
         false,
-        !*config.never_save_binary(),
+        !config.never_save_binary(),
         config,
         &temp_dir,
         &temp_dir_string,

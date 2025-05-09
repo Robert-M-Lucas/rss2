@@ -59,7 +59,7 @@ fn wrapped_main() -> Result<(), String> {
     }
 
     let args = RssArgs::parse();
-    VERBOSE.set(*args.verbose()).unwrap();
+    VERBOSE.set(args.verbose()).unwrap();
 
     match args.subcommand() {
         RssSubcommand::Readme => {
@@ -90,9 +90,11 @@ fn wrapped_main() -> Result<(), String> {
 
             exit(code);
         }
-        RssSubcommand::Edit { file } => {
+        RssSubcommand::Edit { file } | RssSubcommand::New { file } => {
+            let new = matches!(args.subcommand(), RssSubcommand::New { .. });
+            
             let config = get_config()?;
-            edit(&config, PathBuf::from(file))?;
+            edit(&config, PathBuf::from(file), new)?;
         }
         RssSubcommand::Strip { file } => {
             let config = get_config()?;

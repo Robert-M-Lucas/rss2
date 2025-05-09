@@ -22,7 +22,7 @@ pub fn pack<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
 
     let binary = project_edit_loop(
         true,
-        !*config.never_save_binary(),
+        !config.never_save_binary(),
         config,
         &dir,
         dir_string,

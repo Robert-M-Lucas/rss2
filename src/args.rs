@@ -26,6 +26,12 @@ pub enum RssSubcommand {
         file: String,
     },
 
+    #[command(about = "Create an rss file")]
+    New {
+        #[arg(help = "File to create")]
+        file: String,
+    },
+
     #[command(about = "Change config options")]
     Config {
         #[arg(short, long, action, help = "Reset config to default")]

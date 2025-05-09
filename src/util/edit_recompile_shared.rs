@@ -79,7 +79,7 @@ pub fn project_edit_loop<P: AsRef<Path>>(
             return Ok(None);
         }
 
-        let args: &[&str] = if *config.use_debug_mode() {
+        let args: &[&str] = if config.use_debug_mode() {
             println!("Building binary (debug)... ");
             &["build"]
         } else {
@@ -105,7 +105,7 @@ pub fn project_edit_loop<P: AsRef<Path>>(
         } else {
             let binary_path = temp_dir.as_ref().join("target");
 
-            let binary_path = if *config.use_debug_mode() {
+            let binary_path = if config.use_debug_mode() {
                 binary_path.join("debug")
             } else {
                 binary_path.join("release")

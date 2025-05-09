@@ -24,7 +24,7 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<Option<Vec<
         return Ok(None);
     };
 
-    if *config.never_save_binary() {
+    if config.never_save_binary() {
         cprintln!("<yellow, bold>Not saving compiled binary due to config</>");
         return Ok(Some(binary));
     }
