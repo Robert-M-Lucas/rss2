@@ -684,7 +684,7 @@ dependencies = [
 
 [[package]]
 name = "rs-script"
-version = "0.2.23"
+version = "0.2.24"
 dependencies = [
  "build-target",
  "clap",
