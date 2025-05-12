@@ -43,7 +43,7 @@ A `cr-origin.sh/cr-origin.cmd` script will automatically be created allowing you
 rss run myfile.rss
 ```
 
-## Cross Compatability
+### Cross Compatability
 The platform a binary was compiled for is automatically saved. Should this not match the current platform, the file will be automatically recompiled.
 
 ## Other Commands
