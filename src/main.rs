@@ -92,7 +92,7 @@ fn wrapped_main() -> Result<(), String> {
         }
         RssSubcommand::Edit { file } | RssSubcommand::New { file } => {
             let new = matches!(args.subcommand(), RssSubcommand::New { .. });
-            
+
             let config = get_config()?;
             edit(&config, PathBuf::from(file), new)?;
         }

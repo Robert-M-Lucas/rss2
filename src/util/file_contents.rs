@@ -134,13 +134,22 @@ impl FileContents {
         .max()
         .unwrap();
 
-        let verbose_bytes = |bytes: usize, cur_len: usize| -> String {
+        let verbose_bytes = |bytes: usize, cur_len: usize, show_percent: bool| -> String {
             if verbose {
-                format!(
-                    "{} [{} bytes]",
-                    " ".repeat(max_len - cur_len),
-                    bytes.to_formatted_string(&Locale::en)
-                )
+                if show_percent {
+                    format!(
+                        "{} [{} bytes - {:.2}%]",
+                        " ".repeat(max_len - cur_len),
+                        bytes.to_formatted_string(&Locale::en),
+                        (bytes as f64 / total_size as f64) * 100.0
+                    )
+                } else {
+                    format!(
+                        "{} [{} bytes]",
+                        " ".repeat(max_len - cur_len),
+                        bytes.to_formatted_string(&Locale::en)
+                    )
+                }
             } else {
                 "".to_owned()
             }
@@ -149,22 +158,22 @@ impl FileContents {
         cprintln!(
             "  - Layout indicator size:  <cyan>{}</>{}",
             layout_size_str,
-            verbose_bytes(LAYOUT_VERSION_SIZE, layout_size_str.len())
+            verbose_bytes(LAYOUT_VERSION_SIZE, layout_size_str.len(), true)
         );
         cprintln!(
             "  - Project zip size:       <cyan>{}</>{}",
             zip_size_str,
-            verbose_bytes(zip_size, zip_size_str.len())
+            verbose_bytes(zip_size, zip_size_str.len(), true)
         );
         cprintln!(
             "  - Target indicator size:  <cyan>{}</>{}",
             triple_size_str,
-            verbose_bytes(triple_size, triple_size_str.len())
+            verbose_bytes(triple_size, triple_size_str.len(), true)
         );
         cprint!(
             "  - Binary size:            <cyan>{}</>{}",
             binary_size_str,
-            verbose_bytes(binary_size, binary_size_str.len())
+            verbose_bytes(binary_size, binary_size_str.len(), true)
         );
 
         if binary_size == 0 {
@@ -176,7 +185,7 @@ impl FileContents {
         cprintln!(
             "  Total size:               <cyan>{}</>{}",
             total_size_str,
-            verbose_bytes(total_size, total_size_str.len())
+            verbose_bytes(total_size, total_size_str.len(), false)
         );
     }
 

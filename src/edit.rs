@@ -18,9 +18,9 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
 
     if let Some(path_contents) = path_contents {
         if new {
-            return Err("Rss file already exists".to_string())
+            return Err("Rss file already exists".to_string());
         }
-        
+
         extract_project(&path_contents, &temp_dir)?;
     } else {
         time!(
