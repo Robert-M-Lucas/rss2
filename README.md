@@ -1,6 +1,6 @@
 # RS-Script
 
-Stores all the files and the built binary of a Rust project in a single file allowing similar usage to Python scripts.
+Stores all the files and the built binary of a Rust project in a single, runnable file allowing similar usage to Python scripts.
 
 ## Installation
 ```bash
