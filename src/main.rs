@@ -52,7 +52,7 @@ fn wrapped_main() -> Result<(), String> {
         if let Some(file_stem) = PathBuf::from(arg1).file_stem() {
             if file_stem.to_string_lossy() == "rs-script" {
                 cprintln!(
-                    "<yellow, bold>You are using the `rs-script` command. Use `rss` as a shorthand.</>"
+                    "<yellow, bold>You are using the `rs-script` command. `rss` is preferred as a shorthand.</>"
                 )
             }
         }
