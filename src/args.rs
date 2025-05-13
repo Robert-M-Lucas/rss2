@@ -1,4 +1,4 @@
-use clap::Parser;
+use clap::{Parser, Subcommand};
 use derive_getters::Getters;
 
 #[derive(Parser, Debug, Getters)]
@@ -10,9 +10,9 @@ pub struct RssArgs {
     verbose: bool,
 }
 
-#[derive(Parser, Debug)]
+#[derive(Subcommand, Debug)]
 pub enum RssSubcommand {
-    #[command(about = "Runs an rss file")]
+    #[command(visible_alias = "r", about = "Runs an rss file")]
     Run {
         #[arg(help = "File to run")]
         file: String,
@@ -20,19 +20,19 @@ pub enum RssSubcommand {
         args: Vec<String>,
     },
 
-    #[command(about = "Edit/create an rss file")]
+    #[command(visible_alias = "e", about = "Edit/create an rss file")]
     Edit {
         #[arg(help = "File to edit")]
         file: String,
     },
 
-    #[command(about = "Create an rss file")]
+    #[command(visible_alias = "n", about = "Create an rss file")]
     New {
         #[arg(help = "File to create")]
         file: String,
     },
 
-    #[command(about = "Change config options")]
+    #[command(visible_alias = "conf", about = "Change config options")]
     Config {
         #[arg(short, long, action, help = "Reset config to default")]
         reset: bool,
@@ -40,43 +40,55 @@ pub enum RssSubcommand {
         r#where: bool,
     },
 
-    #[command(about = "Strips the compiled binary from an rss file")]
+    #[command(
+        visible_alias = "s",
+        about = "Strips the compiled binary from an rss file"
+    )]
     Strip {
         #[arg(help = "File to strip")]
         file: String,
     },
 
-    #[command(about = "Extracts the Rust project from the rss file")]
+    #[command(
+        visible_alias = "ext",
+        about = "Extracts the Rust project from the rss file"
+    )]
     Extract {
         #[arg(help = "File to extract")]
         file: String,
     },
 
-    #[command(about = "Creates an rss file from a Rust project")]
+    #[command(visible_alias = "p", about = "Creates an rss file from a Rust project")]
     Pack {
         #[arg(help = "Rust project folder")]
         directory: String,
     },
 
-    #[command(about = "Recompile the compiled binary for an rss file")]
+    #[command(
+        visible_alias = "rcmp",
+        about = "Recompile the compiled binary for an rss file"
+    )]
     Recompile {
         #[arg(help = "File to recompile")]
         file: String,
     },
 
-    #[command(about = "Prints statistics about an rss file")]
+    #[command(visible_alias = "stat", about = "Prints statistics about an rss file")]
     Stats {
         #[arg(help = "File to get statistics of")]
         file: String,
     },
 
-    #[command(about = "Prints the file tree within an rss file")]
+    #[command(visible_alias = "t", about = "Prints the file tree within an rss file")]
     Tree {
         #[arg(help = "File to print tree of")]
         file: String,
     },
 
-    #[command(about = "Prints the contents of files within an rss file")]
+    #[command(
+        visible_alias = "c",
+        about = "Prints the contents of files within an rss file"
+    )]
     Cat {
         #[arg(help = "Rss file to print file contents of")]
         file: String,
