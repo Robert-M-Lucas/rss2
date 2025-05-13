@@ -1,4 +1,4 @@
-use crate::config::{Config, get_config_path};
+use crate::config::{get_config_path, Config};
 use crate::time;
 use crate::util::file_contents::FileContents;
 use crate::util::zip::unzip_from_bytes;
@@ -122,9 +122,12 @@ pub fn project_edit_loop<P: AsRef<Path>>(
 
             let binary = match binary {
                 Err(e) => {
-                    println!(
-                        "Failed to find built binary at path {:?} ({e})",
+                    cprintln!(
+                        "<red, bold>Failed to find built binary at path {:?}</> ({e})",
                         binary_path
+                    );
+                    cprintln!(
+                        "<cyan, bold>Is a binary with a different name being built?</>"
                     );
                     println!("Reopen editor? (y/N): ");
                     std::io::stdout().flush().unwrap();
