@@ -8,7 +8,7 @@ cargo install rs-script
 ```
 
 ## Config
-A large number of commands will not work if you don't have an editor configured in the config file!
+_A large number of commands will not work if you don't have an editor configured in the config file!_
 
 - Find the config file: `rss config -w`
 
@@ -16,9 +16,9 @@ You will need to manually edit this file if you don't have the default editor
 
 - Modify the config with: `rss config`
 
-This uses the editor configured in the config file
+This uses the editor configured in the config file (defaults to vscode).
 
-Example nvim configuration:
+Example nvim configuration (Linux):
 ```json
 "rust_project_edit_command_blocking": {
     "command": "nvim",
@@ -26,6 +26,17 @@ Example nvim configuration:
       "$dir$"
     ],
     "inherit_shell": true
+}
+```
+
+Example RustRover configuration (Linux):
+```json
+"rust_project_edit_command_blocking": {
+    "command": "rust-rover",
+    "args": [
+      "$dir$"
+    ],
+    "inherit_shell": false
 }
 ```
 
