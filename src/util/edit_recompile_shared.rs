@@ -57,7 +57,7 @@ pub fn project_edit_loop<P: AsRef<Path>>(
 
     Ok(loop {
         if !skip_first {
-            println!("Opening editor... ");
+            println!("Opening editor (and waiting for close)... ");
 
             if let Err(e) = config
                 .rust_project_edit_command_blocking()

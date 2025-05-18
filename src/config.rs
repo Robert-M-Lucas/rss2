@@ -117,7 +117,7 @@ pub fn edit_config(config: &Config) -> Result<(), String> {
     let Some(config_path) = config_path.to_str().to_owned() else {
         return Err("E02 Failed to get config path".to_owned());
     };
-    println!("Opening editor...");
+    println!("Opening editor (and waiting for close)...");
 
     if let Err(e) = config
         .config_edit_command()
