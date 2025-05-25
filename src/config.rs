@@ -19,9 +19,9 @@ pub struct Config {
     rust_project_edit_command_blocking: EditCommand,
     use_debug_mode: bool,
     never_save_binary: bool,
+    auto_append_rss_ext: bool,
 }
 
-#[allow(clippy::derivable_impls)]
 impl Default for Config {
     fn default() -> Self {
         Config {
@@ -29,6 +29,7 @@ impl Default for Config {
             rust_project_edit_command_blocking: Default::default(),
             use_debug_mode: false,
             never_save_binary: false,
+            auto_append_rss_ext: true,
         }
     }
 }

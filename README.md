@@ -67,4 +67,4 @@ Add `-v` after `rss` to get verbose information.
 - Print the file tree within an rss file: `rss tree myfile.rss`
 - Print the contents of a file / files within an rss file (by default only shows .rs files): `rss cat myfile.rss`
 - Read this README: `rss readme`
-- Command help: `rss help`
+- Command help (useful for learning command shorthands): `rss help`

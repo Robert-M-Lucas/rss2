@@ -1,4 +1,5 @@
 use crate::config::Config;
+use crate::util::auto_append_rss;
 use crate::util::edit_recompile_shared::{
     create_temp_project_dir, extract_project, project_edit_loop,
 };
@@ -7,20 +8,27 @@ use crate::util::file_contents::FileContents;
 use crate::util::zip::zip_dir_to_bytes;
 use crate::{TARGET_TRIPLE, time};
 use color_print::{cformat, cprintln};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::{env, fs};
 
 pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), String> {
-    let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
+    let creating = !path.as_ref().is_file();
+    if !creating && new {
+        return Err("Rss file already exists".to_string());
+    }
+
+    let path = if creating {
+        auto_append_rss(path, config)
+    } else {
+        PathBuf::from(path.as_ref())
+    };
 
     let path_contents = FileContents::from_path(&path)?;
+
+    let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
     let cargo_path = temp_dir.path().join("Cargo.toml");
 
     if let Some(path_contents) = path_contents {
-        if new {
-            return Err("Rss file already exists".to_string());
-        }
-
         extract_project(&path_contents, &temp_dir)?;
     } else {
         time!(
@@ -167,7 +175,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
 
     file_contents.print_stats(
         &path
-            .as_ref()
+            .as_path()
             .file_name()
             .ok_or("E63 Failed to read filename from path")?
             .to_string_lossy(),

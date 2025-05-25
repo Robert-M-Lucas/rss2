@@ -1,17 +1,24 @@
 use crate::config::Config;
+use crate::util::auto_append_rss;
 use crate::util::edit_recompile_shared::{
     create_temp_project_dir, extract_project, project_edit_loop,
 };
 use crate::util::file_contents::FileContents;
 use crate::{TARGET_TRIPLE, time};
 use color_print::{cformat, cprintln};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<Option<Vec<u8>>, String> {
+    let path = if path.as_ref().is_file() {
+        PathBuf::from(path.as_ref())
+    } else {
+        auto_append_rss(path, config)
+    };
+
     let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
 
     let mut path_contents = FileContents::from_path(&path)?
-        .ok_or(format!("E45 File contents not found: {:?}", path.as_ref()))?;
+        .ok_or(format!("E45 File contents not found: {:?}", path.as_path()))?;
 
     extract_project(&path_contents, &temp_dir)?;
 
@@ -38,7 +45,7 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<Option<Vec<
 
     path_contents.print_stats(
         &path
-            .as_ref()
+            .as_path()
             .file_name()
             .ok_or("E62 Failed to read filename from path")?
             .to_string_lossy(),

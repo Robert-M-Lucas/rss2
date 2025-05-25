@@ -1,15 +1,22 @@
 use crate::config::Config;
+use crate::util::auto_append_rss;
 use crate::util::file_contents::FileContents;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
-pub fn stats<P: AsRef<Path>>(_config: &Config, path: P) -> Result<(), String> {
+pub fn stats<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
+    let path = if path.as_ref().is_file() {
+        PathBuf::from(path.as_ref())
+    } else {
+        auto_append_rss(path, config)
+    };
+
     let path_contents = FileContents::from_path(&path)?.ok_or(format!(
         "E78 File contents not found: '{}'",
-        path.as_ref().to_string_lossy()
+        path.as_path().to_string_lossy()
     ))?;
 
     let file_name = path
-        .as_ref()
+        .as_path()
         .file_name()
         .ok_or("E79 Failed to directory name")?
         .to_string_lossy();

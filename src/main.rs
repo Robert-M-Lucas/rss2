@@ -1,3 +1,7 @@
+#[macro_use]
+extern crate const_it;
+#[macro_use]
+extern crate static_assertions;
 mod args;
 mod config;
 mod edit;
@@ -13,19 +17,15 @@ mod tree;
 pub mod util;
 
 use crate::args::{RssArgs, RssSubcommand};
+use crate::cat::cat;
 use crate::config::{edit_config, get_config, get_config_path, reset_config};
 use crate::edit::edit;
 use crate::extract::extract;
 use crate::pack::pack;
 use crate::recompile::recompile;
 use crate::run::{RunParam, run};
-use crate::strip::strip;
-#[macro_use]
-extern crate static_assertions;
-#[macro_use]
-extern crate const_it;
-use crate::cat::cat;
 use crate::stats::stats;
+use crate::strip::strip;
 use crate::tree::tree;
 use clap::Parser;
 use color_print::cprintln;

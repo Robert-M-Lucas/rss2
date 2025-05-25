@@ -1,16 +1,23 @@
 use crate::config::Config;
+use crate::util::auto_append_rss;
 use crate::util::file_contents::FileContents;
 use crate::util::zip::{Filter, cat_files};
 use color_print::cprintln;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub fn cat<P: AsRef<Path>>(
-    _config: &Config,
+    config: &Config,
     path: P,
     name: Option<&str>,
     extension: Option<&str>,
     all: bool,
 ) -> Result<(), String> {
+    let path = if path.as_ref().is_file() {
+        PathBuf::from(path.as_ref())
+    } else {
+        auto_append_rss(path, config)
+    };
+
     if name.is_some() && extension.is_some() {
         return Err("E83 Both `name` and `extension` flags cannot be used together.".to_string());
     }
@@ -31,10 +38,8 @@ pub fn cat<P: AsRef<Path>>(
         Filter::Extension("rs".to_string())
     };
 
-    let path_contents = FileContents::from_path(&path)?.ok_or(format!(
-        "E81 File contents not found: '{}'",
-        path.as_ref().to_string_lossy()
-    ))?;
+    let path_contents = FileContents::from_path(&path)?
+        .ok_or(format!("E81 File contents not found: {:?}", path.as_path()))?;
 
     cat_files(path_contents.zipped_contents(), filter)?;
 

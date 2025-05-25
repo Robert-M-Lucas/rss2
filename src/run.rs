@@ -1,9 +1,10 @@
 use crate::config::Config;
+use crate::util::auto_append_rss;
 use crate::util::executable::make_executable;
 use crate::util::file_contents::FileContents;
 use crate::{TARGET_TRIPLE, VERBOSE, time};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 use tempfile::NamedTempFile;
 
@@ -13,15 +14,21 @@ pub enum RunParam<P: AsRef<Path>> {
 }
 
 pub fn run<P: AsRef<Path>>(
-    _config: &Config,
+    config: &Config,
     run_param: RunParam<P>,
     args: &[String],
 ) -> Result<Result<i32, String>, String> {
     let mut _maybe_path_contents = None;
     let bin = match &run_param {
         RunParam::Path(path) => {
-            let path_contents = FileContents::from_path(path)?
-                .ok_or(format!("E36 File contents not found: {:?}", path.as_ref()))?;
+            let path = if path.as_ref().is_file() {
+                PathBuf::from(path.as_ref())
+            } else {
+                auto_append_rss(path, config)
+            };
+
+            let path_contents = FileContents::from_path(path.as_path())?
+                .ok_or(format!("E36 File contents not found: {:?}", path.as_path()))?;
 
             if path_contents.bin_contents().is_empty() {
                 return Ok(Err("rss file has no binary".to_owned()));
