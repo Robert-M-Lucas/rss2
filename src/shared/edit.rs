@@ -172,7 +172,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
     time!(
         write_description,
         false,
-        file_contents.save(&path)?;
+        file_contents.save(&path, config)?;
     );
 
     file_contents.print_stats(

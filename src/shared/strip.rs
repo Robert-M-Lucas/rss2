@@ -23,7 +23,7 @@ pub fn strip<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     time!(
         "Saving stripped file",
         false,
-        path_contents.save(&path)?;
+        path_contents.save(&path, config)?;
     );
 
     path_contents.print_stats(

@@ -21,6 +21,7 @@ pub struct Config {
     use_debug_mode: bool,
     never_save_binary: bool,
     auto_append_rss_ext: bool,
+    make_rss_executable_linux: bool,
 }
 
 impl Default for Config {
@@ -31,6 +32,7 @@ impl Default for Config {
             use_debug_mode: false,
             never_save_binary: false,
             auto_append_rss_ext: true,
+            make_rss_executable_linux: true,
         }
     }
 }

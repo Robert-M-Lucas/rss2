@@ -1,3 +1,4 @@
+use crate::shared::config::Config;
 use crate::shared::util::executable::make_executable;
 use crate::shared::{RS_SCRIPT_VERSION, VERBOSE};
 use crate::time;
@@ -17,7 +18,7 @@ const LAYOUT_VERSION_SIZE: usize = size_of::<LayoutVersionType>();
 
 // ! List of layout versions and newest rs-script version that supports them
 // ! Last entry is the current layout version
-const LAYOUT_VERSIONS: [(LayoutVersionType, &str); 2] = [(1, "0.2.25"), (2, "0.3.0")];
+const LAYOUT_VERSIONS: [(LayoutVersionType, &str); 2] = [(1, "0.2.25"), (2, "0.3.1")];
 
 #[allow(dead_code)]
 const fn version_check() -> bool {
@@ -314,11 +315,14 @@ impl FileContents {
             + self.triple_length..self.contents.len() - LAYOUT_VERSION_SIZE]
     }
 
-    pub fn save<P: AsRef<Path>>(&self, path: P) -> Result<(), String> {
+    pub fn save<P: AsRef<Path>>(&self, path: P, config: &Config) -> Result<(), String> {
         fs::write(path.as_ref(), &self.contents)
             .map_err(|e| format!("E08 Failed to write file: {}", e))?;
+
         #[cfg(unix)]
-        make_executable(path)?;
+        if config.make_rss_executable_linux() {
+            make_executable(path)?;
+        }
 
         Ok(())
     }

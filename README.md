@@ -68,3 +68,10 @@ Add `-v` after `rss` to get verbose information.
 - Print the contents of a file / files within an rss file (by default only shows .rs files): `rss cat myfile.rss`
 - Read this README: `rss readme`
 - Command help (useful for learning command shorthands): `rss help`
+
+## Linux Only
+On Linux, `rss` files are automatically made executable using the `#!/usr/bin/env rss-run` 
+shebang. With `rss-run` in your path, you can run `rss` files like any executable:
+```bash
+./myfile.rss
+```

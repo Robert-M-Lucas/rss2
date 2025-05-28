@@ -57,7 +57,7 @@ pub fn pack<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     time!(
         write_description,
         false,
-        file_contents.save(&file_name)?;
+        file_contents.save(&file_name, config)?;
     );
 
     file_contents.print_stats(&file_name);
