@@ -1,7 +1,7 @@
-use crate::config::Config;
-use crate::util::auto_append_rss;
-use crate::util::file_contents::FileContents;
-use crate::util::zip::{Filter, cat_files};
+use crate::shared::config::Config;
+use crate::shared::util::auto_append_rss;
+use crate::shared::util::file_contents::FileContents;
+use crate::shared::util::zip::{Filter, cat_files};
 use color_print::cprintln;
 use std::path::{Path, PathBuf};
 

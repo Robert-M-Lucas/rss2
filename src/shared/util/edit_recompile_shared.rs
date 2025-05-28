@@ -1,7 +1,7 @@
-use crate::config::{Config, get_config_path};
+use crate::shared::config::{Config, get_config_path};
+use crate::shared::util::file_contents::FileContents;
+use crate::shared::util::zip::unzip_from_bytes;
 use crate::time;
-use crate::util::file_contents::FileContents;
-use crate::util::zip::unzip_from_bytes;
 use color_print::cprintln;
 use std::fs;
 use std::io::Write;
@@ -103,7 +103,7 @@ pub fn project_edit_loop<P: AsRef<Path>>(
                 break None;
             }
         } else {
-            let binary_path = temp_dir.as_ref().join("target");
+            let binary_path = temp_dir.as_ref().join("../../../target");
 
             let binary_path = if config.use_debug_mode() {
                 binary_path.join("debug")

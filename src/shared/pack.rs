@@ -1,8 +1,9 @@
-use crate::config::Config;
-use crate::util::edit_recompile_shared::project_edit_loop;
-use crate::util::file_contents::FileContents;
-use crate::util::zip::zip_dir_to_bytes;
-use crate::{TARGET_TRIPLE, time};
+use crate::shared::TARGET_TRIPLE;
+use crate::shared::config::Config;
+use crate::shared::util::edit_recompile_shared::project_edit_loop;
+use crate::shared::util::file_contents::FileContents;
+use crate::shared::util::zip::zip_dir_to_bytes;
+use crate::time;
 use color_print::cformat;
 use std::fs;
 use std::path::Path;
@@ -29,7 +30,7 @@ pub fn pack<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
         &dir_name,
     )?;
 
-    let target_dir = dir.as_path().join("target");
+    let target_dir = dir.as_path().join("../../target");
     if target_dir.exists() {
         time!(
             "Cleaning up target directory",

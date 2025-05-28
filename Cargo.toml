@@ -1,6 +1,6 @@
 [package]
 name = "rs-script"
-version = "0.2.26"
+version = "0.3.0"
 edition = "2024"
 authors = ["Robert Lucas <100799838+Robert-M-Lucas@users.noreply.github.com>"]
 description = "A tool to create and edit single-file Rust scripts"
@@ -34,3 +34,7 @@ path = "src/main.rs"
 [[bin]]
 name = "rs-script"
 path = "src/main.rs"
+
+[[bin]]
+name = "rss-run"
+path = "src/rss_run.rs"

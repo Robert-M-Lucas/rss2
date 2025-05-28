@@ -1,12 +1,13 @@
-use crate::config::Config;
-use crate::util::auto_append_rss;
-use crate::util::edit_recompile_shared::{
+use crate::shared::TARGET_TRIPLE;
+use crate::shared::config::Config;
+use crate::shared::util::auto_append_rss;
+use crate::shared::util::edit_recompile_shared::{
     create_temp_project_dir, extract_project, project_edit_loop,
 };
-use crate::util::executable::make_executable;
-use crate::util::file_contents::FileContents;
-use crate::util::zip::zip_dir_to_bytes;
-use crate::{TARGET_TRIPLE, time};
+use crate::shared::util::executable::make_executable;
+use crate::shared::util::file_contents::FileContents;
+use crate::shared::util::zip::zip_dir_to_bytes;
+use crate::time;
 use color_print::{cformat, cprintln};
 use std::path::{Path, PathBuf};
 use std::{env, fs};
@@ -26,7 +27,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
     let path_contents = FileContents::from_path(&path)?;
 
     let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
-    let cargo_path = temp_dir.path().join("Cargo.toml");
+    let cargo_path = temp_dir.path().join("../../Cargo.toml");
 
     if let Some(path_contents) = path_contents {
         extract_project(&path_contents, &temp_dir)?;
@@ -136,7 +137,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
         &file_name,
     )?;
 
-    let target_dir = temp_dir.path().join("target");
+    let target_dir = temp_dir.path().join("../../target");
     if target_dir.exists() {
         time!(
             "Cleaning up target directory",

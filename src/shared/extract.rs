@@ -1,8 +1,8 @@
-use crate::config::Config;
+use crate::shared::config::Config;
+use crate::shared::util::auto_append_rss;
+use crate::shared::util::edit_recompile_shared::extract_project;
+use crate::shared::util::file_contents::FileContents;
 use crate::time;
-use crate::util::auto_append_rss;
-use crate::util::edit_recompile_shared::extract_project;
-use crate::util::file_contents::FileContents;
 use std::fs;
 use std::path::{Path, PathBuf};
 

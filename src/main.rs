@@ -2,41 +2,24 @@
 extern crate const_it;
 #[macro_use]
 extern crate static_assertions;
-mod args;
-mod config;
-mod edit;
-mod extract;
-// mod md_reader;
-mod cat;
-mod pack;
-mod recompile;
-mod run;
-mod stats;
-mod strip;
-mod tree;
-pub mod util;
 
-use crate::args::{RssArgs, RssSubcommand};
-use crate::cat::cat;
-use crate::config::{edit_config, get_config, get_config_path, reset_config};
-use crate::edit::edit;
-use crate::extract::extract;
-use crate::pack::pack;
-use crate::recompile::recompile;
-use crate::run::{RunParam, run};
-use crate::stats::stats;
-use crate::strip::strip;
-use crate::tree::tree;
+mod shared;
+
+use crate::shared::VERBOSE;
+use crate::shared::args::{RssArgs, RssSubcommand};
+use crate::shared::cat::cat;
+use crate::shared::config::{edit_config, get_config, get_config_path, reset_config};
+use crate::shared::edit::edit;
+use crate::shared::extract::extract;
+use crate::shared::pack::pack;
+use crate::shared::recompile::recompile;
+use crate::shared::stats::stats;
+use crate::shared::strip::strip;
+use crate::shared::tree::tree;
+use crate::shared::wrapped_run::wrapped_run;
 use clap::Parser;
 use color_print::cprintln;
 use std::path::PathBuf;
-use std::process::exit;
-use std::sync::OnceLock;
-
-const TARGET_TRIPLE: &str = env!("TARGET");
-const RS_SCRIPT_VERSION: &str = env!("CARGO_PKG_VERSION");
-
-pub static VERBOSE: OnceLock<bool> = OnceLock::new();
 
 fn main() {
     #[cfg(all(not(windows), not(unix)))]
@@ -67,28 +50,7 @@ fn wrapped_main() -> Result<(), String> {
             println!("{}", include_str!("../README.md"));
         }
         RssSubcommand::Run { file, args } => {
-            let config = get_config()?;
-            let binary_exists = run(&config, RunParam::Path(&file), args)?;
-
-            // Build and re-run if binary doesn't exist
-            let code = match binary_exists {
-                Ok(code) => code,
-                Err(no_binary_reason) => {
-                    cprintln!("<yellow, bold>[!] {no_binary_reason} - recompiling...</>");
-                    let compiled_binary = recompile(&config, file)?;
-                    if let Some(compiled_binary) = compiled_binary {
-                        if !VERBOSE.get().unwrap() {
-                            println!("Running binary...");
-                        }
-                        run(&config, RunParam::<String>::Binary(compiled_binary), args)?
-                            .unwrap_or(-1)
-                    } else {
-                        -1
-                    }
-                }
-            };
-
-            exit(code);
+            wrapped_run(file, args)?;
         }
         RssSubcommand::Edit { file } | RssSubcommand::New { file } => {
             let new = matches!(args.subcommand(), RssSubcommand::New { .. });

@@ -1,6 +1,7 @@
 pub mod edit_command;
 
-use crate::{VERBOSE, print_task_start, println_task_duration, time};
+use crate::shared::VERBOSE;
+use crate::{print_task_start, println_task_duration, time};
 use color_print::cprintln;
 use derive_getters::Getters;
 use directories::BaseDirs;

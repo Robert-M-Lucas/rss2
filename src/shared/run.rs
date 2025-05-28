@@ -1,8 +1,9 @@
-use crate::config::Config;
-use crate::util::auto_append_rss;
-use crate::util::executable::make_executable;
-use crate::util::file_contents::FileContents;
-use crate::{TARGET_TRIPLE, VERBOSE, time};
+use crate::shared::config::Config;
+use crate::shared::util::auto_append_rss;
+use crate::shared::util::executable::make_executable;
+use crate::shared::util::file_contents::FileContents;
+use crate::shared::{TARGET_TRIPLE, VERBOSE};
+use crate::time;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
