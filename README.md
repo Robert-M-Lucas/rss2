@@ -10,11 +10,11 @@ cargo install rs-script
 ## Config
 _A large number of commands will not work if you don't have an editor configured in the config file!_
 
-- Find the config file: `rss config -w`
+- Find the config file: `rss config -w`/`rss conf -w`
 
 You will need to manually edit this file if you don't have the default editor
 
-- Modify the config with: `rss config`
+- Modify the config with: `rss config`/`rss conf`
 
 This uses the editor configured in the config file (defaults to vscode).
 
@@ -40,18 +40,18 @@ Example RustRover configuration (Linux):
 }
 ```
 
-- Reset the config file: `rss config -r`
+- Reset the config file: `rss config -r`/`rss conf -r`
 
 ## Editing
-```bash
-rss edit myfile.rss
+```
+rss edit myfile.rss [OR] rss e myfile.rss
 ```
 
 A `cr-origin.sh/cr-origin.cmd` script will automatically be created allowing you to `cargo run` in the original directory for ease of development.
 
 ## Running
-```bash
-rss run myfile.rss
+```
+rss run myfile.rss [OR] rss r myfile.rss
 ```
 
 ### Cross Compatability
@@ -59,13 +59,14 @@ The platform a binary was compiled for is automatically saved. Should this not m
 
 ## Other Commands
 Add `-v` after `rss` to get verbose information.
-- Remove the compiled binary part of a file (useful for sharing): `rss strip myfile.rss`
-- Recompile a file: `rss recompile myfile.rss`
-- Extract the Rust source from an rss file: `rss extract myfile.rss`
-- Create an rss file from an existing rust project: `rss pack project_dir`
-- Print statistics for an rss file: `rss stats myfile.rss`
-- Print the file tree within an rss file: `rss tree myfile.rss`
-- Print the contents of a file / files within an rss file (by default only shows .rs files): `rss cat myfile.rss`
+- Edit an rss file and fail if it already exists: `rss new myfile.rss`/`rss n myfile.rss`
+- Remove the compiled binary part of a file (useful for sharing): `rss strip myfile.rss`/`rss s myfile.rss`
+- Recompile a file: `rss recompile myfile.rss`/`rss rcmp myfile.rss`
+- Extract the Rust source from an rss file: `rss extract myfile.rss`/`rss ext myfile.rss`
+- Create an rss file from an existing rust project: `rss pack project_dir`/`rss p project_dir`
+- Print statistics for an rss file: `rss stats myfile.rss`/`rss stat myfile.rss`
+- Print the file tree within an rss file: `rss tree myfile.rss`/`rss t myfile.rss`
+- Print the contents of a file / files within an rss file (by default only shows .rs files): `rss cat myfile.rss`/`rss c myfile.rss`
 - Read this README: `rss readme`
 - Command help (useful for learning command shorthands): `rss help`
 
