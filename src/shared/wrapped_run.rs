@@ -6,7 +6,6 @@ use color_print::cprintln;
 use std::process::exit;
 
 pub fn wrapped_run(file: &str, args: &[String]) -> Result<(), String> {
-    VERBOSE.set(false).unwrap();
     let config = get_config()?;
     let binary_exists = run(&config, RunParam::Path(&file), args)?;
 
