@@ -12,7 +12,7 @@ mod shared;
 fn main() {
     let args: Vec<_> = std::env::args().collect();
 
-    if args.len() > 2 {
+    if args.len() >= 2 {
         if let Err(e) = wrapped_run(&args[1], &args[2..]) {
             cprintln!("\n<red, bold>{e}</>");
         }

@@ -103,7 +103,7 @@ pub fn project_edit_loop<P: AsRef<Path>>(
                 break None;
             }
         } else {
-            let binary_path = temp_dir.as_ref().join("../../../target");
+            let binary_path = temp_dir.as_ref().join("target");
 
             let binary_path = if config.use_debug_mode() {
                 binary_path.join("debug")

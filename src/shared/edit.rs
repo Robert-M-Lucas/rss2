@@ -27,7 +27,8 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
     let path_contents = FileContents::from_path(&path)?;
 
     let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
-    let cargo_path = temp_dir.path().join("../../Cargo.toml");
+
+    let cargo_path = temp_dir.path().join("Cargo.toml");
 
     if let Some(path_contents) = path_contents {
         extract_project(&path_contents, &temp_dir)?;
@@ -137,7 +138,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
         &file_name,
     )?;
 
-    let target_dir = temp_dir.path().join("../../target");
+    let target_dir = temp_dir.path().join("target");
     if target_dir.exists() {
         time!(
             "Cleaning up target directory",

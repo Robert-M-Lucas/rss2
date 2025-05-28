@@ -30,7 +30,7 @@ pub fn pack<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
         &dir_name,
     )?;
 
-    let target_dir = dir.as_path().join("../../target");
+    let target_dir = dir.as_path().join("target");
     if target_dir.exists() {
         time!(
             "Cleaning up target directory",
