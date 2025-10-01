@@ -57,6 +57,19 @@ rss run myfile.rss [OR] rss r myfile.rss
 ### Cross Compatability
 The platform a binary was compiled for is automatically saved. Should this not match the current platform, the file will be automatically recompiled.
 
+### Linux Only
+On Linux, `rss` files are automatically made executable using the `#!/usr/bin/env rss-run`
+shebang. With `rss-run` in your path, you can run `rss` files like any executable:
+```bash
+./myfile.rss
+```
+
+## Installing
+```
+rss install myfile.rss [OR] rss i myfile.rss
+```
+(uses `cargo install` to install globally)
+
 ## Other Commands
 Add `-v` after `rss` to get verbose information.
 - Edit an rss file and fail if it already exists: `rss new myfile.rss`/`rss n myfile.rss`
@@ -70,9 +83,3 @@ Add `-v` after `rss` to get verbose information.
 - Read this README: `rss readme`
 - Command help (useful for learning command shorthands): `rss help`
 
-## Linux Only
-On Linux, `rss` files are automatically made executable using the `#!/usr/bin/env rss-run` 
-shebang. With `rss-run` in your path, you can run `rss` files like any executable:
-```bash
-./myfile.rss
-```
