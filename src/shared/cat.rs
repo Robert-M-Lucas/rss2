@@ -11,6 +11,7 @@ pub fn cat<P: AsRef<Path>>(
     name: Option<&str>,
     extension: Option<&str>,
     all: bool,
+    show_hidden: bool,
 ) -> Result<(), String> {
     let path = if path.as_ref().is_file() {
         PathBuf::from(path.as_ref())
@@ -41,7 +42,7 @@ pub fn cat<P: AsRef<Path>>(
     let path_contents = FileContents::from_path(&path)?
         .ok_or(format!("E81 File contents not found: {:?}", path.as_path()))?;
 
-    cat_files(path_contents.zipped_contents(), filter)?;
+    cat_files(path_contents.zipped_contents(), filter, show_hidden)?;
 
     Ok(())
 }

@@ -1,9 +1,7 @@
 use crate::shared::TARGET_TRIPLE;
 use crate::shared::config::Config;
 use crate::shared::util::auto_append_rss;
-use crate::shared::util::edit_recompile_shared::{
-    create_temp_project_dir, extract_project, project_edit_loop,
-};
+use crate::shared::util::edit_recompile_shared::{create_temp_project_dir, extract_project, project_edit_loop, EditLoopMode};
 use crate::shared::util::executable::make_executable;
 use crate::shared::util::file_contents::FileContents;
 use crate::shared::util::zip::zip_dir_to_bytes;
@@ -59,7 +57,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
     }
 
     let cwd = env::current_dir()
-        .map_err(|e| format!("E51: Failed to get current working directory: {}", e))?;
+        .map_err(|e| format!("E51 Failed to get current working directory: {}", e))?;
     let cr_origin;
     let delete_cr_origin;
     #[cfg(unix)]
@@ -131,7 +129,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
 
     let binary = project_edit_loop(
         false,
-        !config.never_save_binary(),
+        if config.never_save_binary() { EditLoopMode::EditOnly } else { EditLoopMode::CompileBinary},
         config,
         &temp_dir,
         &temp_dir_string,

@@ -45,9 +45,16 @@ pub fn extract_project<P: AsRef<Path>>(
     Ok(())
 }
 
+#[derive(Debug, Eq, PartialEq)]
+pub enum EditLoopMode {
+    EditOnly,
+    CompileBinary,
+    Install
+}
+
 pub fn project_edit_loop<P: AsRef<Path>>(
     mut skip_first: bool,
-    compile_binary: bool,
+    edit_loop_mode: EditLoopMode,
     config: &Config,
     temp_dir: P,
     temp_dir_string: &str,
@@ -74,72 +81,81 @@ pub fn project_edit_loop<P: AsRef<Path>>(
         }
         skip_first = false;
 
-        if !compile_binary {
-            cprintln!("<yellow, bold>Not compiling binary due to config</>");
-            return Ok(None);
-        }
-
-        let args: &[&str] = if config.use_debug_mode() {
-            println!("Building binary (debug)... ");
-            &["build"]
-        } else {
-            println!("Building binary (release)... ");
-            &["build", "--release"]
-        };
-
-        let output = Command::new("cargo")
-            .current_dir(temp_dir.as_ref())
-            .args(args)
-            .status();
-        let output = output.map_err(|e| format!("Error when running binary command: {}", e))?;
-
-        if !output.success() {
-            println!("Cargo build failed with code {:?}", output.code());
-            println!("Reopen editor? (y/N): ");
-            std::io::stdout().flush().unwrap();
-            let mut input = String::new();
-            std::io::stdin().read_line(&mut input).unwrap();
-            if input.to_ascii_lowercase().trim() != "y" {
-                break None;
+        match edit_loop_mode {
+            EditLoopMode::EditOnly => {
+                cprintln!("<yellow, bold>Not compiling binary due to config</>");
+                return Ok(None);
             }
-        } else {
-            let binary_path = temp_dir.as_ref().join("target");
+            EditLoopMode::CompileBinary => {
+                let args: &[&str] = if config.use_debug_mode() {
+                    println!("Building binary (debug)... ");
+                    &["build"]
+                } else {
+                    println!("Building binary (release)... ");
+                    &["build", "--release"]
+                };
 
-            let binary_path = if config.use_debug_mode() {
-                binary_path.join("debug")
-            } else {
-                binary_path.join("release")
-            };
+                let output = Command::new("cargo")
+                    .current_dir(temp_dir.as_ref())
+                    .args(args)
+                    .status();
+                let output = output.map_err(|e| format!("E86 Error when running build command: {}", e))?;
 
-            #[cfg(unix)]
-            let binary_path = binary_path.join(file_name);
-            #[cfg(windows)]
-            let binary_path = binary_path.join(format!("{file_name}.exe"));
-            #[cfg(not(any(unix, windows)))]
-            compile_error!("This crate only supports Unix or Windows targets.");
+                if output.success() {
+                    let binary_path = temp_dir.as_ref().join("target");
 
-            let binary = time!("Reading built binary", false, fs::read(&binary_path));
+                    let binary_path = if config.use_debug_mode() {
+                        binary_path.join("debug")
+                    } else {
+                        binary_path.join("release")
+                    };
 
-            let binary = match binary {
-                Err(e) => {
-                    cprintln!(
+                    #[cfg(unix)]
+                    let binary_path = binary_path.join(file_name);
+                    #[cfg(windows)]
+                    let binary_path = binary_path.join(format!("{file_name}.exe"));
+                    #[cfg(not(any(unix, windows)))]
+                    compile_error!("This crate only supports Unix or Windows targets.");
+
+                    let binary = time!("Reading built binary", false, fs::read(&binary_path));
+
+                    match binary {
+                        Ok(binary) => break Some(binary),
+                        Err(e) => {
+                            cprintln!(
                         "<red, bold>Failed to find built binary at path {:?}</> ({e})",
                         binary_path
                     );
-                    cprintln!("<cyan, bold>Is a binary with a different name being built?</>");
-                    println!("Reopen editor? (y/N): ");
-                    std::io::stdout().flush().unwrap();
-                    let mut input = String::new();
-                    std::io::stdin().read_line(&mut input).unwrap();
-                    if input.to_ascii_lowercase().trim() != "y" {
-                        break None;
-                    }
-                    continue;
+                            cprintln!("<cyan, bold>Is a binary with a different name being built?</>");
+                        }
+                    };
                 }
-                Ok(b) => b,
-            };
+                else {
+                    println!("Cargo build failed {}", output.code().map_or_else(|| "with no code".to_string(), |c| format!("with code {c}")));
+                }
+            }
+            EditLoopMode::Install => {
+                let output = Command::new("cargo")
+                    .current_dir(temp_dir.as_ref())
+                    .args(["install", "--path", "."])
+                    .status();
+                let output = output.map_err(|e| format!("Error when running install command: {}", e))?;
 
-            break Some(binary);
+                if output.success() {
+                    break None;
+                }
+                else {
+                    println!("Cargo install failed {}", output.code().map_or_else(|| "with no code".to_string(), |c| format!("with code {c}")));
+                }
+            }
+        }
+
+        println!("Open editor? (y/N): ");
+        std::io::stdout().flush().unwrap();
+        let mut input = String::new();
+        std::io::stdin().read_line(&mut input).unwrap();
+        if input.to_ascii_lowercase().trim() != "y" {
+            break None;
         }
     })
 }

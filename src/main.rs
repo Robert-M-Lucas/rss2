@@ -20,6 +20,7 @@ use crate::shared::wrapped_run::wrapped_run;
 use clap::Parser;
 use color_print::cprintln;
 use std::path::PathBuf;
+use crate::shared::install::install;
 
 fn main() {
     #[cfg(all(not(windows), not(unix)))]
@@ -46,7 +47,6 @@ fn wrapped_main() -> Result<(), String> {
 
     match args.subcommand() {
         RssSubcommand::Readme => {
-            // md_reader(include_str!("../README.md"))?;
             println!("{}", include_str!("../README.md"));
         }
         RssSubcommand::Run { file, args } => {
@@ -57,6 +57,10 @@ fn wrapped_main() -> Result<(), String> {
 
             let config = get_config()?;
             edit(&config, PathBuf::from(file), new)?;
+        }
+        RssSubcommand::Install { file } => {
+            let config = get_config()?;
+            install(&config, PathBuf::from(file))?;
         }
         RssSubcommand::Strip { file } => {
             let config = get_config()?;
@@ -96,15 +100,16 @@ fn wrapped_main() -> Result<(), String> {
             let config = get_config()?;
             stats(&config, file)?;
         }
-        RssSubcommand::Tree { file } => {
+        RssSubcommand::Tree { file, show_hidden } => {
             let config = get_config()?;
-            tree(&config, file)?;
+            tree(&config, file, *show_hidden)?;
         }
         RssSubcommand::Cat {
             file,
             name,
             extension,
             all,
+            show_hidden
         } => {
             let config = get_config()?;
             cat(
@@ -113,6 +118,7 @@ fn wrapped_main() -> Result<(), String> {
                 name.as_ref().map(|x| x.as_str()),
                 extension.as_ref().map(|x| x.as_str()),
                 *all,
+                *show_hidden
             )?;
         }
     }

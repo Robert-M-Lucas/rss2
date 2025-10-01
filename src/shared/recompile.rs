@@ -1,9 +1,7 @@
 use crate::shared::TARGET_TRIPLE;
 use crate::shared::config::Config;
 use crate::shared::util::auto_append_rss;
-use crate::shared::util::edit_recompile_shared::{
-    create_temp_project_dir, extract_project, project_edit_loop,
-};
+use crate::shared::util::edit_recompile_shared::{create_temp_project_dir, extract_project, project_edit_loop, EditLoopMode};
 use crate::shared::util::file_contents::FileContents;
 use crate::time;
 use color_print::{cformat, cprintln};
@@ -16,14 +14,14 @@ pub fn recompile<P: AsRef<Path>>(config: &Config, path: P) -> Result<Option<Vec<
         auto_append_rss(path, config)
     };
 
-    let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
-
     let mut path_contents = FileContents::from_path(&path)?
         .ok_or(format!("E45 File contents not found: {:?}", path.as_path()))?;
+    
+    let (temp_dir, temp_dir_string, file_name) = create_temp_project_dir(&path)?;
 
     extract_project(&path_contents, &temp_dir)?;
 
-    let binary = project_edit_loop(true, true, config, &temp_dir, &temp_dir_string, &file_name)?;
+    let binary = project_edit_loop(true, EditLoopMode::CompileBinary, config, &temp_dir, &temp_dir_string, &file_name)?;
 
     let Some(binary) = binary else {
         cprintln!(

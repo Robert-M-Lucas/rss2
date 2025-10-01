@@ -32,6 +32,12 @@ pub enum RssSubcommand {
         file: String,
     },
 
+    #[command(visible_alias = "i", about = "Install an rss file globally with `cargo install`")]
+    Install {
+        #[arg(help = "File to install")]
+        file: String,
+    },
+
     #[command(visible_alias = "conf", about = "Change config options")]
     Config {
         #[arg(short, long, action, help = "Reset config to default")]
@@ -83,6 +89,8 @@ pub enum RssSubcommand {
     Tree {
         #[arg(help = "File to print tree of")]
         file: String,
+        #[arg(help = "Show hidden files")]
+        show_hidden: bool,
     },
 
     #[command(
@@ -103,6 +111,8 @@ pub enum RssSubcommand {
             help = "Prints all files (default is only .rs files)"
         )]
         all: bool,
+        #[arg(help = "Print hidden files")]
+        show_hidden: bool,
     },
 
     #[command(about = "Read the README")]

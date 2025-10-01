@@ -4,7 +4,7 @@ use crate::shared::util::file_contents::FileContents;
 use crate::shared::util::zip::print_tree;
 use std::path::{Path, PathBuf};
 
-pub fn tree<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
+pub fn tree<P: AsRef<Path>>(config: &Config, path: P, show_hidden: bool) -> Result<(), String> {
     let path = if path.as_ref().is_file() {
         PathBuf::from(path.as_ref())
     } else {
@@ -22,7 +22,7 @@ pub fn tree<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
         path.as_path().to_string_lossy()
     ))?;
 
-    print_tree(path_contents.zipped_contents(), &file_name)?;
+    print_tree(path_contents.zipped_contents(), &file_name, show_hidden)?;
 
     Ok(())
 }

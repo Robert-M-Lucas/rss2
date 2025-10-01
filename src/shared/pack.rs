@@ -1,6 +1,6 @@
 use crate::shared::TARGET_TRIPLE;
 use crate::shared::config::Config;
-use crate::shared::util::edit_recompile_shared::project_edit_loop;
+use crate::shared::util::edit_recompile_shared::{project_edit_loop, EditLoopMode};
 use crate::shared::util::file_contents::FileContents;
 use crate::shared::util::zip::zip_dir_to_bytes;
 use crate::time;
@@ -21,14 +21,14 @@ pub fn pack<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
         .ok_or("E72 Failed to directory name")?
         .to_string_lossy();
 
-    let binary = project_edit_loop(
+    let binary = if config.never_save_binary() { None } else { project_edit_loop(
         true,
-        !config.never_save_binary(),
+        EditLoopMode::CompileBinary,
         config,
         &dir,
         dir_string,
         &dir_name,
-    )?;
+    )? };
 
     let target_dir = dir.as_path().join("target");
     if target_dir.exists() {

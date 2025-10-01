@@ -14,6 +14,7 @@ pub mod strip;
 pub mod tree;
 pub mod util;
 pub mod wrapped_run;
+pub mod install;
 
 pub const TARGET_TRIPLE: &str = env!("TARGET");
 pub const RS_SCRIPT_VERSION: &str = env!("CARGO_PKG_VERSION");

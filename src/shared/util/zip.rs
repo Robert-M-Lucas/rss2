@@ -1,4 +1,4 @@
-use color_print::cprintln;
+use color_print::{cformat, cprintln};
 use std::borrow::Cow;
 use std::fs;
 use std::fs::File;
@@ -7,6 +7,7 @@ use std::path::Path;
 use walkdir::WalkDir;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, ZipArchive, ZipWriter};
+use zip::read::ZipFile;
 
 pub fn zip_dir_to_bytes<P: AsRef<Path>>(src_dir: P) -> Result<Vec<u8>, String> {
     let mut buffer = Cursor::new(Vec::new());
@@ -92,19 +93,21 @@ pub fn unzip_from_bytes<P: AsRef<Path>>(bytes: &[u8], target_dir: P) -> Result<(
 struct FileTree {
     name: String,
     hidden: bool,
+    directory: bool,
     children: Vec<FileTree>,
 }
 
 impl FileTree {
-    fn new(name: String, hidden: bool) -> Self {
+    fn new(name: String, hidden: bool, directory: bool) -> Self {
         Self {
             name,
             hidden,
+            directory,
             children: Vec::new(),
         }
     }
 
-    fn add_path(&mut self, new: &[Cow<str>], hidden: bool) {
+    fn add_path(&mut self, new: &[Cow<str>], hidden: bool, directory: bool) {
         if new.is_empty() {
             return;
         }
@@ -112,17 +115,17 @@ impl FileTree {
             if new.len() == 1 {
                 tree.hidden = hidden;
             } else {
-                tree.add_path(&new[1..], hidden);
+                tree.add_path(&new[1..], hidden, directory);
             }
         } else if new.len() == 1 {
             self.children
-                .push(FileTree::new(new[0].to_string(), hidden));
+                .push(FileTree::new(new[0].to_string(), hidden, directory));
         } else {
-            self.children.push(FileTree::new(new[0].to_string(), false));
+            self.children.push(FileTree::new(new[0].to_string(), false, directory));
             self.children
                 .last_mut()
                 .unwrap()
-                .add_path(&new[1..], hidden);
+                .add_path(&new[1..], hidden, directory);
         }
     }
 
@@ -131,14 +134,15 @@ impl FileTree {
     }
 
     fn print_int(&self, prefix: String, is_last: bool, is_top: bool, show_hidden: bool) {
+        let fname = if self.directory { Cow::from(cformat!("<b>{}</b>", self.name)) } else { Cow::from(&self.name) };
+        
         if is_top {
-            println!("{}", self.name)
+            println!("{fname}")
         } else {
             println!(
-                "{}{} {}",
+                "{}{} {fname}",
                 prefix,
-                if is_last { "└──" } else { "├──" },
-                self.name
+                if is_last { "└──" } else { "├──" }
             );
         }
 
@@ -157,25 +161,33 @@ impl FileTree {
     }
 }
 
-pub fn print_tree(bytes: &[u8], file_name: &str) -> Result<(), String> {
+fn is_hidden<G: Read>(file: &ZipFile<G>) -> bool {
+    file.mangled_name().iter().any(|p| p.to_string_lossy().starts_with(".") && p.len() > 1)
+}
+
+pub fn print_tree(bytes: &[u8], file_name: &str, show_hidden: bool) -> Result<(), String> {
     let reader = Cursor::new(bytes);
     let mut archive =
         ZipArchive::new(reader).map_err(|e| format!("E82 Failed to open zip: {}", e))?;
 
-    let mut tree = FileTree::new(file_name.to_string(), false);
+    let mut tree = FileTree::new(file_name.to_string(), false, true);
 
     for i in 0..archive.len() {
         let file = archive
             .by_index(i)
             .map_err(|e| format!("E29 Failed to open archive: {}", e))?;
 
+        if !show_hidden && is_hidden(&file) {
+            continue;
+        }
+        
         let mangled = file.mangled_name();
         let sections = mangled
             .iter()
             .map(|s| s.to_string_lossy())
             .collect::<Vec<_>>();
 
-        tree.add_path(&sections, false);
+        tree.add_path(&sections, false, file.is_dir());
     }
 
     tree.print(true);
@@ -189,7 +201,7 @@ pub enum Filter {
     Extension(String),
 }
 
-pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
+pub fn cat_files(bytes: &[u8], filter: Filter, show_hidden: bool) -> Result<(), String> {
     let reader = Cursor::new(bytes);
     let mut archive =
         ZipArchive::new(reader).map_err(|e| format!("E28 Failed to open zip: {}", e))?;
@@ -199,7 +211,7 @@ pub fn cat_files(bytes: &[u8], filter: Filter) -> Result<(), String> {
         let file = archive
             .by_index(i)
             .map_err(|e| format!("E29 Failed to open archive: {}", e))?;
-        if file.is_dir() {
+        if file.is_dir() || (!show_hidden && is_hidden(&file)) {
             continue;
         }
         let path = file.mangled_name();
