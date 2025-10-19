@@ -35,15 +35,13 @@ fn main() {
 }
 
 fn wrapped_main() -> Result<(), String> {
-    if let Some(arg1) = std::env::args().next() {
-        if let Some(file_stem) = PathBuf::from(arg1).file_stem() {
-            if file_stem.to_string_lossy() == "rs-script" {
+    if let Some(arg1) = std::env::args().next()
+        && let Some(file_stem) = PathBuf::from(arg1).file_stem()
+            && file_stem.to_string_lossy() == "rs-script" {
                 cprintln!(
                     "<yellow, bold>You are using the `rs-script` command. `rss` is preferred as a shorthand.</>"
                 )
             }
-        }
-    }
 
     let args = RssArgs::parse();
     VERBOSE.set(args.verbose()).unwrap();

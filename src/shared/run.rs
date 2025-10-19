@@ -6,8 +6,7 @@ use crate::shared::{TARGET_TRIPLE, VERBOSE};
 use crate::time;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::time::Duration;
-use std::{fs, thread};
+use std::fs;
 use tempfile::NamedTempFile;
 
 pub enum RunParam<P: AsRef<Path>> {

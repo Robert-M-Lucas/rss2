@@ -7,7 +7,7 @@ use std::thread;
 use std::time::Duration;
 
 thread_local! {
-    static CURRENT_COMMAND: RefCell<Option<Rc<RefCell<Child>>>> = RefCell::new(None);
+    static CURRENT_COMMAND: RefCell<Option<Rc<RefCell<Child>>>> = const { RefCell::new(None) };
 }
 
 pub trait InterruptableCommand {

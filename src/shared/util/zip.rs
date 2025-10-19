@@ -63,12 +63,11 @@ pub fn unzip_from_bytes<P: AsRef<Path>>(bytes: &[u8], target_dir: P) -> Result<(
                 .map_err(|e| format!("E30 Failed to create directory: {}", e))?;
         } else {
             // Create parent directories if needed
-            if let Some(p) = outpath.parent() {
-                if !p.exists() {
+            if let Some(p) = outpath.parent()
+                && !p.exists() {
                     fs::create_dir_all(p)
                         .map_err(|e| format!("E31 Failed to create directory: {}", e))?;
                 }
-            }
 
             let mut outfile =
                 File::create(&outpath).map_err(|e| format!("E32 Failed to create file: {}", e))?;
