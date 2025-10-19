@@ -57,11 +57,16 @@ rss run myfile.rss [OR] rss r myfile.rss
 ### Cross Compatability
 The platform a binary was compiled for is automatically saved. Should this not match the current platform, the file will be automatically recompiled.
 
-### Linux Only
+### Script Files as Executables
 On Linux, `rss` files are automatically made executable using the `#!/usr/bin/env rss-run`
 shebang. With `rss-run` in your path, you can run `rss` files like any executable:
 ```bash
 ./myfile.rss
+```
+
+On Windows, you can do something similar by adding `.rss` to your system's list of executable file extensions, then when prompted selecting the provided `rss-run` binary to always open `.rss` files. This allows similar usage to Linux:
+```bash
+.\myfile.rss
 ```
 
 ## Installing

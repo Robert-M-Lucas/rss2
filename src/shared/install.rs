@@ -1,8 +1,10 @@
-use std::path::{Path, PathBuf};
 use crate::shared::config::Config;
 use crate::shared::util::auto_append_rss;
-use crate::shared::util::edit_recompile_shared::{create_temp_project_dir, extract_project, project_edit_loop, EditLoopMode};
+use crate::shared::util::edit_recompile_shared::{
+    EditLoopMode, create_temp_project_dir, extract_project, project_edit_loop,
+};
 use crate::shared::util::file_contents::FileContents;
+use std::path::{Path, PathBuf};
 
 pub fn install<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
     let path = if path.as_ref().is_file() {
@@ -18,7 +20,14 @@ pub fn install<P: AsRef<Path>>(config: &Config, path: P) -> Result<(), String> {
 
     extract_project(&path_contents, &temp_dir)?;
 
-    project_edit_loop(true, EditLoopMode::Install, config, &temp_dir, &temp_dir_string, &file_name)?;
-    
+    project_edit_loop(
+        true,
+        EditLoopMode::Install,
+        config,
+        &temp_dir,
+        &temp_dir_string,
+        &file_name,
+    )?;
+
     Ok(())
 }

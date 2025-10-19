@@ -6,6 +6,9 @@ pub mod edit;
 pub mod extract;
 // mod md_reader;
 pub mod cat;
+pub mod ctrl_c_handler;
+pub mod install;
+pub mod interruptable_command;
 pub mod pack;
 pub mod recompile;
 pub mod run;
@@ -14,7 +17,6 @@ pub mod strip;
 pub mod tree;
 pub mod util;
 pub mod wrapped_run;
-pub mod install;
 
 pub const TARGET_TRIPLE: &str = env!("TARGET");
 pub const RS_SCRIPT_VERSION: &str = env!("CARGO_PKG_VERSION");

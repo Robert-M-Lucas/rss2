@@ -9,8 +9,10 @@ use crate::shared::VERBOSE;
 use crate::shared::args::{RssArgs, RssSubcommand};
 use crate::shared::cat::cat;
 use crate::shared::config::{edit_config, get_config, get_config_path, reset_config};
+use crate::shared::ctrl_c_handler::init_ctrl_c_handler;
 use crate::shared::edit::edit;
 use crate::shared::extract::extract;
+use crate::shared::install::install;
 use crate::shared::pack::pack;
 use crate::shared::recompile::recompile;
 use crate::shared::stats::stats;
@@ -20,11 +22,12 @@ use crate::shared::wrapped_run::wrapped_run;
 use clap::Parser;
 use color_print::cprintln;
 use std::path::PathBuf;
-use crate::shared::install::install;
 
 fn main() {
     #[cfg(all(not(windows), not(unix)))]
     compile_error!("Only Windows and Unix-derivatives are supported");
+
+    init_ctrl_c_handler();
 
     if let Err(e) = wrapped_main() {
         cprintln!("\n<red, bold>{e}</>");
@@ -109,7 +112,7 @@ fn wrapped_main() -> Result<(), String> {
             name,
             extension,
             all,
-            show_hidden
+            show_hidden,
         } => {
             let config = get_config()?;
             cat(
@@ -118,7 +121,7 @@ fn wrapped_main() -> Result<(), String> {
                 name.as_ref().map(|x| x.as_str()),
                 extension.as_ref().map(|x| x.as_str()),
                 *all,
-                *show_hidden
+                *show_hidden,
             )?;
         }
     }

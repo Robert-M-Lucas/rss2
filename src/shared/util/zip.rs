@@ -5,9 +5,9 @@ use std::fs::File;
 use std::io::{BufRead, Cursor, Read, Write};
 use std::path::Path;
 use walkdir::WalkDir;
+use zip::read::ZipFile;
 use zip::write::FileOptions;
 use zip::{CompressionMethod, ZipArchive, ZipWriter};
-use zip::read::ZipFile;
 
 pub fn zip_dir_to_bytes<P: AsRef<Path>>(src_dir: P) -> Result<Vec<u8>, String> {
     let mut buffer = Cursor::new(Vec::new());
@@ -121,7 +121,8 @@ impl FileTree {
             self.children
                 .push(FileTree::new(new[0].to_string(), hidden, directory));
         } else {
-            self.children.push(FileTree::new(new[0].to_string(), false, directory));
+            self.children
+                .push(FileTree::new(new[0].to_string(), false, directory));
             self.children
                 .last_mut()
                 .unwrap()
@@ -134,16 +135,16 @@ impl FileTree {
     }
 
     fn print_int(&self, prefix: String, is_last: bool, is_top: bool, show_hidden: bool) {
-        let fname = if self.directory { Cow::from(cformat!("<b>{}</b>", self.name)) } else { Cow::from(&self.name) };
-        
+        let fname = if self.directory {
+            Cow::from(cformat!("<b>{}</b>", self.name))
+        } else {
+            Cow::from(&self.name)
+        };
+
         if is_top {
             println!("{fname}")
         } else {
-            println!(
-                "{}{} {fname}",
-                prefix,
-                if is_last { "└──" } else { "├──" }
-            );
+            println!("{}{} {fname}", prefix, if is_last { "└──" } else { "├──" });
         }
 
         let new_prefix = if is_top {
@@ -162,7 +163,9 @@ impl FileTree {
 }
 
 fn is_hidden<G: Read>(file: &ZipFile<G>) -> bool {
-    file.mangled_name().iter().any(|p| p.to_string_lossy().starts_with(".") && p.len() > 1)
+    file.mangled_name()
+        .iter()
+        .any(|p| p.to_string_lossy().starts_with(".") && p.len() > 1)
 }
 
 pub fn print_tree(bytes: &[u8], file_name: &str, show_hidden: bool) -> Result<(), String> {
@@ -180,7 +183,7 @@ pub fn print_tree(bytes: &[u8], file_name: &str, show_hidden: bool) -> Result<()
         if !show_hidden && is_hidden(&file) {
             continue;
         }
-        
+
         let mangled = file.mangled_name();
         let sections = mangled
             .iter()

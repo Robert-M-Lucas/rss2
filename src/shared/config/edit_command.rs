@@ -62,13 +62,21 @@ impl Default for EditCommand {
         #[cfg(unix)]
         return EditCommand {
             command: "code".to_owned(),
-            args: vec!["--new-window".to_owned(), "--wait".to_owned(), PATH_REPLACE_ARG.to_owned()],
+            args: vec![
+                "--new-window".to_owned(),
+                "--wait".to_owned(),
+                PATH_REPLACE_ARG.to_owned(),
+            ],
             inherit_shell: false,
         };
         #[cfg(windows)]
         return EditCommand {
             command: "code.cmd".to_owned(),
-            args: vec!["--new-window".to_owned(), "--wait".to_owned(), PATH_REPLACE_ARG.to_owned()],
+            args: vec![
+                "--new-window".to_owned(),
+                "--wait".to_owned(),
+                PATH_REPLACE_ARG.to_owned(),
+            ],
             inherit_shell: false,
         };
     }

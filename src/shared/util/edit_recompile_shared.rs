@@ -1,4 +1,5 @@
 use crate::shared::config::{Config, get_config_path};
+use crate::shared::interruptable_command::InterruptableCommand;
 use crate::shared::util::file_contents::FileContents;
 use crate::shared::util::zip::unzip_from_bytes;
 use crate::time;
@@ -49,7 +50,7 @@ pub fn extract_project<P: AsRef<Path>>(
 pub enum EditLoopMode {
     EditOnly,
     CompileBinary,
-    Install
+    Install,
 }
 
 pub fn project_edit_loop<P: AsRef<Path>>(
@@ -98,8 +99,9 @@ pub fn project_edit_loop<P: AsRef<Path>>(
                 let output = Command::new("cargo")
                     .current_dir(temp_dir.as_ref())
                     .args(args)
-                    .status();
-                let output = output.map_err(|e| format!("E86 Error when running build command: {}", e))?;
+                    .run_interruptable()?;
+                // let output =
+                //     output.map_err(|e| format!("E86 Error when running build command: {}", e))?;
 
                 if output.success() {
                     let binary_path = temp_dir.as_ref().join("target");
@@ -123,29 +125,42 @@ pub fn project_edit_loop<P: AsRef<Path>>(
                         Ok(binary) => break Some(binary),
                         Err(e) => {
                             cprintln!(
-                        "<red, bold>Failed to find built binary at path {:?}</> ({e})",
-                        binary_path
-                    );
-                            cprintln!("<cyan, bold>Is a binary with a different name being built?</>");
+                                "<red, bold>Failed to find built binary at path {:?}</> ({e})",
+                                binary_path
+                            );
+                            cprintln!(
+                                "<cyan, bold>Is a binary with a different name being built?</>"
+                            );
                         }
                     };
-                }
-                else {
-                    println!("Cargo build failed {}", output.code().map_or_else(|| "with no code".to_string(), |c| format!("with code {c}")));
+                } else {
+                    println!(
+                        "Cargo build failed {}",
+                        output.code().map_or_else(
+                            || "with no code".to_string(),
+                            |c| format!("with code {c}")
+                        )
+                    );
                 }
             }
             EditLoopMode::Install => {
                 let output = Command::new("cargo")
                     .current_dir(temp_dir.as_ref())
                     .args(["install", "--path", "."])
-                    .status();
-                let output = output.map_err(|e| format!("Error when running install command: {}", e))?;
+                    .run_interruptable()?;
+                // let output =
+                //     output.map_err(|e| format!("Error when running install command: {}", e))?;
 
                 if output.success() {
                     break None;
-                }
-                else {
-                    println!("Cargo install failed {}", output.code().map_or_else(|| "with no code".to_string(), |c| format!("with code {c}")));
+                } else {
+                    println!(
+                        "Cargo install failed {}",
+                        output.code().map_or_else(
+                            || "with no code".to_string(),
+                            |c| format!("with code {c}")
+                        )
+                    );
                 }
             }
         }

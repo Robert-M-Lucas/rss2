@@ -3,6 +3,7 @@ use crate::shared::config::Config;
 use color_print::cprintln;
 use std::path::{Path, PathBuf};
 
+pub mod command_fmt;
 pub mod edit_recompile_shared;
 pub mod executable;
 pub mod file_contents;

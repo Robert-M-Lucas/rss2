@@ -4,9 +4,10 @@ use crate::shared::util::executable::make_executable;
 use crate::shared::util::file_contents::FileContents;
 use crate::shared::{TARGET_TRIPLE, VERBOSE};
 use crate::time;
-use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::time::Duration;
+use std::{fs, thread};
 use tempfile::NamedTempFile;
 
 pub enum RunParam<P: AsRef<Path>> {
@@ -85,6 +86,10 @@ pub fn run<P: AsRef<Path>>(
         }
         0
     };
+
+    // Windows can hold a lock on the exe after it has finished executing for a moment
+    #[cfg(target_os = "windows")]
+    thread::sleep(Duration::from_millis(1000));
 
     time!(
         "Removing temporary file",

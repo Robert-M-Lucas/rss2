@@ -32,7 +32,10 @@ pub enum RssSubcommand {
         file: String,
     },
 
-    #[command(visible_alias = "i", about = "Install an rss file globally with `cargo install`")]
+    #[command(
+        visible_alias = "i",
+        about = "Install an rss file globally with `cargo install`"
+    )]
     Install {
         #[arg(help = "File to install")]
         file: String,
