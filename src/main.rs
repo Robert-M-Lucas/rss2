@@ -21,6 +21,7 @@ use crate::shared::tree::tree;
 use crate::shared::wrapped_run::wrapped_run;
 use clap::Parser;
 use color_print::cprintln;
+use colored_json::ToColoredJson;
 use std::path::PathBuf;
 
 fn main() {
@@ -37,11 +38,12 @@ fn main() {
 fn wrapped_main() -> Result<(), String> {
     if let Some(arg1) = std::env::args().next()
         && let Some(file_stem) = PathBuf::from(arg1).file_stem()
-            && file_stem.to_string_lossy() == "rs-script" {
-                cprintln!(
-                    "<yellow, bold>You are using the `rs-script` command. `rss` is preferred as a shorthand.</>"
-                )
-            }
+        && file_stem.to_string_lossy() == "rs-script"
+    {
+        cprintln!(
+            "<yellow, bold>You are using the `rs-script` command. `rss` is preferred as a shorthand.</>"
+        )
+    }
 
     let args = RssArgs::parse();
     VERBOSE.set(args.verbose()).unwrap();
@@ -85,7 +87,7 @@ fn wrapped_main() -> Result<(), String> {
             } else {
                 // Reset
                 let (p, json) = reset_config()?;
-                println!("Reset config to:\n{json}");
+                println!("Reset config to:\n{}", json.to_colored_json_auto().unwrap());
                 println!("Reset config at '{p}'");
             }
         }

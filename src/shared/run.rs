@@ -4,9 +4,9 @@ use crate::shared::util::executable::make_executable;
 use crate::shared::util::file_contents::FileContents;
 use crate::shared::{TARGET_TRIPLE, VERBOSE};
 use crate::time;
+use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-use std::fs;
 use tempfile::NamedTempFile;
 
 pub enum RunParam<P: AsRef<Path>> {
