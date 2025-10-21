@@ -707,7 +707,7 @@ dependencies = [
 
 [[package]]
 name = "rs-script"
-version = "0.3.6"
+version = "0.3.7"
 dependencies = [
  "build-target",
  "clap",

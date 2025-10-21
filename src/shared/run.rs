@@ -7,6 +7,10 @@ use crate::time;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
+#[cfg(target_os = "windows")]
+use std::thread;
+#[cfg(target_os = "windows")]
+use std::time::Duration;
 use tempfile::NamedTempFile;
 
 pub enum RunParam<P: AsRef<Path>> {
