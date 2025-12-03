@@ -18,7 +18,7 @@ const LAYOUT_VERSION_SIZE: usize = size_of::<LayoutVersionType>();
 
 // ! List of layout versions and newest rs-script version that supports them
 // ! Last entry is the current layout version
-const LAYOUT_VERSIONS: [(LayoutVersionType, &str); 2] = [(1, "0.2.25"), (2, "0.3.7")];
+const LAYOUT_VERSIONS: [(LayoutVersionType, &str); 2] = [(1, "0.2.25"), (2, "0.3.8")];
 
 #[allow(dead_code)]
 const fn version_check() -> bool {
@@ -151,7 +151,7 @@ impl FileContents {
             if verbose {
                 if show_percent {
                     format!(
-                        "{}  [{} bytes | {:.2}%]",
+                        "{}  [{} bytes / {:.2}%]",
                         " ".repeat(max_len - cur_len),
                         bytes.to_formatted_string(&Locale::en),
                         (bytes as f64 / total_size as f64) * 100.0

@@ -7,9 +7,9 @@ use crate::time;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::Command;
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 use std::thread;
-#[cfg(target_os = "windows")]
+#[cfg(windows)]
 use std::time::Duration;
 use tempfile::NamedTempFile;
 
@@ -91,7 +91,7 @@ pub fn run<P: AsRef<Path>>(
     };
 
     // Windows can hold a lock on the exe after it has finished executing for a moment
-    #[cfg(target_os = "windows")]
+    #[cfg(windows)]
     thread::sleep(Duration::from_millis(1000));
 
     time!(
