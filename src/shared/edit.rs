@@ -9,7 +9,7 @@ use crate::shared::util::file_contents::FileContents;
 use crate::shared::util::zip::zip_dir_to_bytes;
 use crate::time;
 use color_print::{cformat, cprintln};
-use std::path::{Path, PathBuf};
+use std::path::{self, Path, PathBuf};
 use std::{env, fs};
 
 pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), String> {
@@ -187,29 +187,34 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
             .to_string_lossy(),
     );
 
+
+    let (rel_path, run_path) = if path.is_absolute() {
+        (path.to_string_lossy().to_string(), path.to_string_lossy().to_string())
+    }
+    else {
+        // Try to resolve, for example, ./t.rss to t.rss
+        if let Ok(cwd) = env::current_dir() && let Ok(abs) = path.canonicalize() {
+            if let Ok(rel) = abs.strip_prefix(cwd) {
+                (rel.to_string_lossy().to_string(), format!(".{}{}", path::MAIN_SEPARATOR, rel.to_string_lossy()))
+            }
+            else {
+                (path.to_string_lossy().to_string(), format!(".{}{}", path::MAIN_SEPARATOR, path.to_string_lossy()))
+            }
+        }
+        else {
+            (path.to_string_lossy().to_string(), format!(".{}{}", path::MAIN_SEPARATOR, path.to_string_lossy()))
+        }
+    };
     
     #[cfg(unix)]
     {
-        let norm_path = path.as_os_str().to_string_lossy();
-        let run_path = if path.is_absolute() {
-            path.to_string_lossy().to_string()
-        }
-        else {
-            format!("./{norm_path}")
-        };
-        if config.make_rss_executable_linux() { println!("\nRun with `rss r {norm_path}` or `{run_path}`"); }
-        else { println!("\nRun with `rss r {norm_path}` (enable make_rss_executable_linux in config to use `./{run_path}`)"); }
+        
+        if config.make_rss_executable_linux() { println!("\nRun with `rss r {rel_path}` or `{run_path}`"); }
+        else { cprintln!("\nRun with `rss r {rel_path}` (enable <blue,bold>\"make_rss_executable_linux\"</> in config to use `./{run_path}`)"); }
     }
     #[cfg(windows)]
     {
-        let norm_path = path.as_os_str().to_string_lossy();
-        let run_path = if path.is_absolute() {
-            path.to_string_lossy().to_string()
-        }
-        else {
-            format!(".\\{norm_path}")
-        };
-        println!("\nRun with `rss r {norm_path}` or (`{run_path}` if you have set up a file association with rss-run)");
+        println!("\nRun with `rss r {rel_path}` or (`{run_path}` if you have set up a file association with `rss-run`)");
     }
 
     Ok(())
