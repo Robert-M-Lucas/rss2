@@ -197,8 +197,8 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
         else {
             format!("./{norm_path}")
         };
-        if config.make_rss_executable_linux() { println!("Run with `rss r {norm_path}` or `{run_path}`"); }
-        else { println!("Run with `rss r {norm_path}` (enable make_rss_executable_linux in config to use `./{run_path}`)"); }
+        if config.make_rss_executable_linux() { println!("\nRun with `rss r {norm_path}` or `{run_path}`"); }
+        else { println!("\nRun with `rss r {norm_path}` (enable make_rss_executable_linux in config to use `./{run_path}`)"); }
     }
     #[cfg(windows)]
     {
@@ -209,7 +209,7 @@ pub fn edit<P: AsRef<Path>>(config: &Config, path: P, new: bool) -> Result<(), S
         else {
             format!(".\\{norm_path}")
         };
-        println!("Run with `rss r {norm_path}` or (`{run_path}` if you have set up a file association with rss-run)");
+        println!("\nRun with `rss r {norm_path}` or (`{run_path}` if you have set up a file association with rss-run)");
     }
 
     Ok(())
